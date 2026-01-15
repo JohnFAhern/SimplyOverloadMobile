@@ -12,6 +12,7 @@ const SignUp = () => {
     const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
     const [confirmPassword, setConfirmPassword] = useState("")
+    const [error, setError] = useState("Passwords Dont Match ⚠️")
   return (
     <View style={styles.container}>
         
@@ -20,7 +21,9 @@ const SignUp = () => {
                 <Text style={styles.headerItem}>SimplyOverload💪</Text>
             </View>
             <View style={styles.labelAndInputContainer}>
+                
                 <View style={styles.labelAndTextContainer}>
+                    <Text>{error}</Text>
                     <Text style={styles.labelItem}> Enter Email:</Text>
                     <TextInput
                         style={styles.textInputItem}
@@ -44,7 +47,7 @@ const SignUp = () => {
                     <TextInput
                         style={styles.textInputItem}
                         secureTextEntry={true}
-                        value={password}
+                        value={confirmPassword}
                         placeholder='Confirm Password'
                         onChangeText={setConfirmPassword}
                     />

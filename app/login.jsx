@@ -11,15 +11,19 @@ import { authStyles as styles } from './styles/authStyles'
 const Login = () => {
     const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
+    const [error, setError] = useState("Invalid Username or Password ⚠️")
   return (
     <View style={styles.container}>
         
         <View style={styles.boxContainer}>
             <View style={styles.headerContainer}>
                 <Text style={styles.headerItem}>SimplyOverload💪</Text>
+                
             </View>
             <View style={styles.labelAndInputContainer}>
+                
                 <View style={styles.labelAndTextContainer}>
+                    <Text>{error}</Text>
                     <Text style={styles.labelItem}> Enter Email:</Text>
                     <TextInput
                         style={styles.textInputItem}
