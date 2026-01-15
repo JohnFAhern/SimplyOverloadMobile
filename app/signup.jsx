@@ -1,7 +1,7 @@
 import { View, Text, Pressable, TextInput } from 'react-native'
 import React, { useState } from 'react'
 import { Link } from "expo-router"
-import { authStyles as styles } from './styles/authStyles'
+import { authStyles as styles } from '../styles/authStyles'
 // colors:
 // #181C14
 // #3C3D37

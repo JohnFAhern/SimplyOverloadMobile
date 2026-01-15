@@ -1,7 +1,8 @@
 import { View, Text, Pressable, TextInput } from 'react-native'
-import React, { useState } from 'react'
+import React, { useState, useContext } from 'react'
 import { Link } from "expo-router"
-import { authStyles as styles } from './styles/authStyles'
+import { authStyles as styles } from '../styles/authStyles'
+import TalkContext from './context/TalkContext'
 // colors:
 // #181C14
 // #3C3D37
@@ -12,6 +13,7 @@ const Login = () => {
     const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
     const [error, setError] = useState("Invalid Username or Password ⚠️")
+    const { greet } = useContext(TalkContext)
   return (
     <View style={styles.container}>
         
@@ -43,7 +45,10 @@ const Login = () => {
                     />
                 </View>
             </View>
-            <Pressable style={styles.loginButton}>
+            <Pressable 
+                style={styles.loginButton}
+                onPress={() => greet("John")}
+            >
                 <Text style={styles.loginButtonText}>Login</Text>
             </Pressable>
             <View style={styles.signUpContainer}>
