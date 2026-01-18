@@ -1,19 +1,42 @@
 import { View, Text, Pressable, TextInput } from 'react-native'
-import React, { useState, useContext } from 'react'
 import { Link } from "expo-router"
 import { authStyles as styles } from '../styles/authStyles'
-import TalkContext from './context/TalkContext'
-// colors:
-// #181C14
-// #3C3D37
-// #697565
-// #ECDFCC
+import AuthContext from './context/AuthContext'
+import React, { createContext, useState, useEffect, useContext } from 'react'
+import { useRouter } from "expo-router"
+
+
 
 const Login = () => {
     const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
-    const [error, setError] = useState("Invalid Username or Password ⚠️")
-    const { greet } = useContext(TalkContext)
+    const [error, setError] = useState("")
+
+    const router = useRouter()
+    const { login, setUser } = useContext(AuthContext)
+
+
+    const handleSubmit = async () =>{
+        setError("")
+        try{
+            const res = await login(email, password);
+            console.log("Response from server:", res.data);
+            if (res.data.status === "success"){
+                let userID = parseInt(res.data.user_id)
+                console.log("Setting user ID to:", userID);
+                setUser(userID)
+                console.log("Navigating to dashboard...");
+                router.push("/dashboard");
+            } else {
+                setError("Invalid email or password");
+            }
+        }catch(error){
+            console.log("Login:", error)
+            setError("An error occurred during login");
+        }
+    }
+
+
   return (
     <View style={styles.container}>
         
@@ -47,7 +70,7 @@ const Login = () => {
             </View>
             <Pressable 
                 style={styles.loginButton}
-                onPress={() => greet("John")}
+                onPress={handleSubmit}
             >
                 <Text style={styles.loginButtonText}>Login</Text>
             </Pressable>

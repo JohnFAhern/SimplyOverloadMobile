@@ -1,7 +1,8 @@
 import { View, Text, Pressable, TextInput } from 'react-native'
-import React, { useState } from 'react'
-import { Link } from "expo-router"
+import React, { useState, useContext } from 'react'
+import { Link, useRouter } from "expo-router"
 import { authStyles as styles } from '../styles/authStyles'
+import AuthContext from './context/AuthContext'
 // colors:
 // #181C14
 // #3C3D37
@@ -12,7 +13,37 @@ const SignUp = () => {
     const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
     const [confirmPassword, setConfirmPassword] = useState("")
-    const [error, setError] = useState("Passwords Dont Match ⚠️")
+    const [error, setError] = useState("")
+
+    const router = useRouter()
+    const { register, setUser } = useContext(AuthContext)
+
+    const handleSubmit = async () =>{
+        setError("")
+        
+        if (password !== confirmPassword){
+            setError("Passwords Dont Match!")
+            return
+        }
+
+        try{
+            const res = await register(email, password);
+            console.log("Response from server:", res.data);
+            if (res.data.status === "success"){
+                let userID = parseInt(res.data.user_id)
+                console.log("Setting user ID to:", userID);
+                setUser(userID)
+                console.log("Navigating to dashboard...");
+                router.push("/dashboard");
+            } else {
+                setError("Invalid email or password");
+            }
+        }catch(error){
+            console.log("Login:", error)
+            setError("An error occurred during login");
+        }
+    }
+
   return (
     <View style={styles.container}>
         
@@ -53,7 +84,9 @@ const SignUp = () => {
                     />
                 </View>
             </View>
-            <Pressable style={styles.loginButton}>
+            <Pressable 
+              style={styles.loginButton}
+              onPress={handleSubmit}>
                 <Text style={styles.loginButtonText}>SignUp</Text>
             </Pressable>
             <View style={styles.signUpContainer}>

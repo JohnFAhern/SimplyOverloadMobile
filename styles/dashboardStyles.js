@@ -8,6 +8,8 @@ export const dashboardStyles = StyleSheet.create({
         alignItems: "center",
         justifyContent: "center",
         padding: 10,
+        gap: 10
+        
     },
     labelAndTextContainer: {
         justifyContent: "center",
@@ -55,7 +57,7 @@ export const dashboardStyles = StyleSheet.create({
         fontSize: 20,
     },
     headerContainer: {
-        height: "10%",
+        height: "8%",
         justifyContent: "center",
         borderBottomColor: "#697565",
         borderBottomLeftRadius: 50,
@@ -103,4 +105,10 @@ export const dashboardStyles = StyleSheet.create({
         color: "white",
         fontSize: 45,
     },
+    modalContainer: {
+        height: "100%",
+        backgroundColor: "#F1F0E4",
+        justifyContent: "center",
+        gap: 30,
+    }
 });
