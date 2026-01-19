@@ -41,7 +41,7 @@ export const dashboardStyles = StyleSheet.create({
         borderRadius: 50,
         paddingVertical: 10,
     },
-    loginButton: {
+    defaultButton: {
         height: 70,
         width: "60%",
         backgroundColor: "#7D8D86",
@@ -51,7 +51,7 @@ export const dashboardStyles = StyleSheet.create({
         justifyContent: "center",
         alignSelf: "center",
     },
-    loginButtonText: {
+    defaultButtonText: {
         textAlign: "center",
         color: "white",
         fontSize: 20,
@@ -73,22 +73,6 @@ export const dashboardStyles = StyleSheet.create({
         justifyContent: "center",
         gap: 30,
     },
-    signUpContainer: {
-        flexDirection: "row",
-        alignItems: "center",
-        alignSelf: "center"
-    },
-    signUpItemText: {
-        padding: 10,
-        textAlign: "center",
-        fontSize: 15,
-    },
-    signUpItemLink: {
-        padding: 10,
-        textAlign: "center",
-        fontSize: 15,
-        color: "blue"
-    },
     dayButtonContainer: {
         justifyContent: "center",
         alignSelf: "center",
@@ -106,9 +90,15 @@ export const dashboardStyles = StyleSheet.create({
         fontSize: 45,
     },
     modalContainer: {
+        width: "100%",
+        flex: 1,
+        alignSelf: "center",
         height: "100%",
         backgroundColor: "#F1F0E4",
         justifyContent: "center",
         gap: 30,
+        justifyContent: "center",
+        alignContent: "center",
+        padding: 20,
     }
 });
