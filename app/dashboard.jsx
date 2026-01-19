@@ -1,16 +1,54 @@
 import { View, Text, Pressable, TextInput, ScrollView, Modal } from 'react-native'
-import React, { useState } from 'react'
+import React, { useState, useContext, useEffect } from 'react'
 import { dashboardStyles as styles } from '../styles/dashboardStyles'
+import { Link, useRouter } from "expo-router"
+import AuthContext from './context/AuthContext'
+import ExerciseContext from './context/ExerciseContext'
 
 const Dashboard = () => {
 
   const [isModalVisible, setIsModalVisible] = useState(false)
   const [error, setError] = useState("")
   const [newDayName, setNewDayName] = useState("")
+  const [days, setDays] = useState([])
 
-  const handleSubmit = () => {
-    input = prompt("Enter day!")
-  }
+  const router = useRouter()
+
+  const { currentUser } = useContext(AuthContext)
+  const { getDays, createDay } = useContext(ExerciseContext)
+
+  useEffect(() => {
+      if (!currentUser) return;  
+
+      getDays(currentUser)
+          .then(res => {
+              setDays(res.data.days);
+          })
+          .catch(err => {
+              setError(err ||"Couldn't load days");
+          });
+
+    }, [currentUser]);
+
+    const handleCreateDay = async () =>{
+        setError("")
+        if (days.some((d) => d.day_name === newDayName)) {
+            setError(`${newDayName} already exists!`);
+            return;
+        }
+        try{
+            const res = await createDay(currentUser, newDayName);
+            console.log("Response from server:", res.data);
+            if (res.data.status === "success"){
+                await getDays(currentUser).then((res) => {
+                    setDays(res.data.days);
+                });
+            }
+        }catch(error){
+            console.log("Create Day:", error)
+            setError(error.response?.data?.message || "An error occurred during Create Day");
+        }
+    }
 
   return (
     <View style={styles.container}>
@@ -35,35 +73,54 @@ const Dashboard = () => {
             </View>
             <Pressable 
                 style={styles.loginButton}
-                onPress={() => {
+                onPress={async () => {
+                  await handleCreateDay()
                   setIsModalVisible(false)
+                  setNewDayName("")
                   console.log("Create day pressed")
                 }}
             >
                 <Text style={styles.loginButtonText}>Create Day</Text>
             </Pressable>
+            <Pressable 
+                style={styles.loginButton}
+                onPress={() => setIsModalVisible(false)}
+            >
+                <Text style={styles.loginButtonText}>Cancel</Text>
+            </Pressable> 
 
-          </View>      
+          </View> 
+    
         </Modal>
       <View style={styles.headerContainer}>
           <Text style={styles.headerItem}>Days</Text>
       </View>
-      <ScrollView 
-        style={styles.boxContainer}
-        contentContainerStyle={{ gap: 15, paddingVertical: 15 }}
-      >
-        <Pressable 
-          style={styles.dayButtonContainer}
+      {days == null ? (
+        <Text>Loading</Text>
+      ) : days.length === 0 ? (
+        <Text> You Dont Have Any Days!</Text>
+      ) : (
+        <ScrollView 
+          style={styles.boxContainer}
+          contentContainerStyle={{ gap: 15, paddingVertical: 15 }}
         >
-          <Text 
-            style={styles.daysButtonText}
-            numberOfLines={1}
-            ellipsizeMode="tail"
-          >
-            Push
-          </Text>
-        </Pressable>
-      </ScrollView>
+          {days.map((day) => (
+            <Pressable 
+              style={styles.dayButtonContainer}
+              key={day.day_id}
+            >
+              <Text 
+                style={styles.daysButtonText}
+                numberOfLines={1}
+                ellipsizeMode="tail"
+              >
+                {day.day_name}
+              </Text>
+            </Pressable>
+          ))}
+        </ScrollView>
+      )
+      }
       <Pressable 
           style={styles.loginButton}
           onPress={() => {
@@ -71,7 +128,7 @@ const Dashboard = () => {
             console.log("Create day pressed")
           }}
       >
-          <Text style={styles.loginButtonText}>Create Day</Text>
+          <Text style={styles.loginButtonText}>Create Day</Text> 
       </Pressable>
 
 
