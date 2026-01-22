@@ -4,92 +4,94 @@ import { dashboardStyles as styles } from '../styles/dashboardStyles'
 import { Link, useRouter } from "expo-router"
 import AuthContext from './context/AuthContext'
 import ExerciseContext from './context/ExerciseContext'
-import CreateDayModal from './components/CreateDayModal'
+import CreateExerciseModal from './components/CreateExerciseModal'
 
 const Dashboard = () => {
 
   const [isModalVisible, setIsModalVisible] = useState(false)
   const [error, setError] = useState("")
-  const [newDayName, setNewDayName] = useState("")
-  const [days, setDays] = useState([])
+  const [newExerciseName, setNewExerciseName] = useState("")
+  const [exercises, setExercises] = useState([])
+  const[sets, setSets] = useState([])
+  const [weight, setWeight] = useState(0)
+  const [reps, setReps] = useState(0)
 
   const router = useRouter()
 
   const { currentUser } = useContext(AuthContext)
-  const { getDays, createDay, currentDay, setCurrentDay, currentExercise } = useContext(ExerciseContext)
-
+  const { currentDay, setCurrentDay, getExercises, createExercise, setCurrentExercise, currentExercise, getSets } = useContext(ExerciseContext)
   useEffect(() => {
       if (!currentUser) return;  
 
-      getDays(currentUser)
+      getSets(currentExercise.exercise_id)
           .then(res => {
-              setDays(res.data.days);
+              setSets(res.data.sets);
           })
           .catch(err => {
-              setError(err ||"Couldn't load days");
+              setError(err ||"Couldn't load Sets");
           });
 
-    }, [currentUser]);
+    }, [currentExercise]);
 
-    const handleCreateDay = async () =>{
+    const handleCreateSet = async () =>{
         setError("")
-        if (days.some((d) => d.day_name === newDayName)) {
-            setError(`${newDayName} already exists!`);
+        if (exercises.some((e) => e.exercise_name === newExerciseName)) {
+            setError(`${newExerciseName} already exists!`);
             return;
         }
         try{
-            const res = await createDay(currentUser, newDayName);
+            const res = await createExercise(newExerciseName);
             console.log("Response from server:", res.data);
             if (res.data.status === "success"){
-                await getDays(currentUser).then((res) => {
-                    setDays(res.data.days);
+                await getExercises(currentDay.day_id).then((res) => {
+                    setExercises(res.data.exercises);
                 });
             }
         }catch(error){
-            console.log("Create Day:", error)
-            setError(error.response?.data?.message || "An error occurred during Create Day");
+            console.log("Create Exercise:", error)
+            setError(error.response?.data?.message || "An error occurred during Create Exercise");
         }
     }
-
-    const handleDaySelect = (dayID) => {
-      setCurrentDay(dayID)
-      router.push("/exercises")
+    const handleExerciseSelect = (exercise) => {
+      setCurrentExercise(exercise)
+      router.push("/sets")
     }
 
   return (
     <View style={styles.container}>
-      <CreateDayModal
+      <CreateSetModal
         visible={isModalVisible}
         onClose={() => setIsModalVisible(false)}
-        handleCreateDay={handleCreateDay}
-        dayName={newDayName}
-        setDayName={setNewDayName}
+        handleCreateSet={handleCreateSet}
+        weight={newExerciseName}
+        setExerciseName={setNewExerciseName}
         error={error}
       />
       <View style={styles.headerContainer}>
-          <Text style={styles.headerItem}>Days</Text>
+          <Text style={styles.headerItem}>{currentExercise.exercise_name}</Text>
       </View>
-      {days == null ? (
+      {sets == null ? (
         <Text>Loading</Text>
-      ) : days.length === 0 ? (
-        <Text> You Dont Have Any Days!</Text>
+      ) : sets.length === 0 ? (
+        <Text> You Dont Have Any Sets!</Text>
       ) : (
         <ScrollView 
           style={styles.boxContainer}
           contentContainerStyle={{ gap: 15, paddingVertical: 15 }}
         >
-          {days.map((day) => (
+          {exercises.map((set) => (
             <Pressable 
               style={styles.dayButtonContainer}
-              key={day.day_id}
-              onPress={() => handleDaySelect(day)}
+              key={exercise.exercise_id}
+              onPress={() => handleExerciseSelect(exercise.exercise_id)}
             >
               <Text 
                 style={styles.daysButtonText}
                 numberOfLines={1}
                 ellipsizeMode="tail"
               >
-                {day.day_name}
+                Weight: {set.weight}
+                Reps: {set.reps}
               </Text>
             </Pressable>
           ))}
@@ -100,10 +102,10 @@ const Dashboard = () => {
           style={styles.defaultButton}
           onPress={() => {
             setIsModalVisible(true)
-            console.log("Create day pressed")
+            console.log("Create Exercise pressed")
           }}
       >
-          <Text style={styles.defaultButtonText}>Create Day</Text> 
+          <Text style={styles.defaultButtonText}>Create Exercise</Text> 
       </Pressable>
 
 

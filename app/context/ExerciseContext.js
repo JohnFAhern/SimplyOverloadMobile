@@ -6,7 +6,8 @@ const ExerciseContext = createContext(null)
 
 export function ExerciseProvider({children}) {
   const [currentDay, setCurrentDay] = useState(null) 
-  const [currentExercise, setCurrentExercise] = useState(0)
+  const [currentExercise, setCurrentExercise] = useState(null)
+  
 
   useEffect(() => {
     const loadUserData = async () => {

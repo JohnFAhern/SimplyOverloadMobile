@@ -16,7 +16,7 @@ const Dashboard = () => {
   const router = useRouter()
 
   const { currentUser } = useContext(AuthContext)
-  const { currentDay, setCurrentDay, getExercises, createExercise, } = useContext(ExerciseContext)
+  const { currentDay, setCurrentDay, getExercises, createExercise, setCurrentExercise } = useContext(ExerciseContext)
   useEffect(() => {
       if (!currentUser) return;  
 
@@ -28,7 +28,7 @@ const Dashboard = () => {
               setError(err ||"Couldn't load Exercises");
           });
 
-    }, [currentUser]);
+    }, [currentDay]);
 
     const handleCreateExercise = async () =>{
         setError("")
@@ -48,6 +48,10 @@ const Dashboard = () => {
             console.log("Create Exercise:", error)
             setError(error.response?.data?.message || "An error occurred during Create Exercise");
         }
+    }
+    const handleExerciseSelect = (exercise) => {
+      setCurrentExercise(exercise)
+      router.push("/sets")
     }
 
   return (
@@ -75,7 +79,8 @@ const Dashboard = () => {
           {exercises.map((exercise) => (
             <Pressable 
               style={styles.dayButtonContainer}
-              key={exercise}
+              key={exercise.exercise_id}
+              onPress={() => handleExerciseSelect(exercise)}
             >
               <Text 
                 style={styles.daysButtonText}
