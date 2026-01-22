@@ -7,6 +7,14 @@ const ExerciseContext = createContext(null)
 export function ExerciseProvider({children}) {
   const [currentDay, setCurrentDay] = useState(0) 
   const [currentExercise, setCurrentExercise] = useState(0)
+
+  useEffect(() => {
+    const loadUserData = async () => {
+      const dayID = await AsyncStorage.getItem("dayID")
+      if(dayID) setCurrentDay(parseInt(dayID))
+    }
+    loadUserData()
+  }, [])
   
   const createDay = (currentUser, day_name) =>{
     return axios.post("https://simplyoverload.com/api/createDay.php", {
@@ -47,6 +55,8 @@ export function ExerciseProvider({children}) {
     <ExerciseContext.Provider value={{
       currentDay,
       currentExercise,
+      setCurrentDay,
+      setCurrentExercise,
       createDay,
       getDays,
       createExercise,

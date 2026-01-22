@@ -16,7 +16,7 @@ const Dashboard = () => {
   const router = useRouter()
 
   const { currentUser } = useContext(AuthContext)
-  const { getDays, createDay } = useContext(ExerciseContext)
+  const { getDays, createDay, currentDay, setCurrentDay } = useContext(ExerciseContext)
 
   useEffect(() => {
       if (!currentUser) return;  
@@ -51,6 +51,11 @@ const Dashboard = () => {
         }
     }
 
+    const handleDaySelect = (dayID) => {
+      setCurrentDay(dayID)
+      router.push("/exercises")
+    }
+
   return (
     <View style={styles.container}>
       <CreateDayModal
@@ -77,6 +82,7 @@ const Dashboard = () => {
             <Pressable 
               style={styles.dayButtonContainer}
               key={day.day_id}
+              onPress={handleDaySelect(day.day_id)}
             >
               <Text 
                 style={styles.daysButtonText}
