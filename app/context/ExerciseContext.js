@@ -5,7 +5,7 @@ import axios from 'axios'
 const ExerciseContext = createContext(null)
 
 export function ExerciseProvider({children}) {
-  const [currentDay, setCurrentDay] = useState(0) 
+  const [currentDay, setCurrentDay] = useState(null) 
   const [currentExercise, setCurrentExercise] = useState(0)
 
   useEffect(() => {
@@ -35,7 +35,7 @@ export function ExerciseProvider({children}) {
 
   const createExercise = (exercise_name) => {
     return axios.post("https://simplyoverload.com/api/createExercise.php", {
-      currentDay,
+      currentDay: currentDay?.day_id,
       exercise_name
     }, {
       headers: {
@@ -47,6 +47,22 @@ export function ExerciseProvider({children}) {
   const getExercises = (dayID) => {
     return axios.get("https://simplyoverload.com/api/getExercises.php", {
       params: { dayID }
+    });
+  }
+  function createSets(weight, reps){
+    return axios.post("https://simplyoverload.com/api/createSets.php", {
+      exerciseID: currentExercise,
+      reps,
+      weight
+    }, {
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    })
+  }
+  function getSets(exerciseID) {
+    return axios.get("https://simplyoverload.com/api/getSets.php", {
+      params: { exerciseID }
     });
   }
 
@@ -61,6 +77,8 @@ export function ExerciseProvider({children}) {
       getDays,
       createExercise,
       getExercises,
+      getSets,
+      createSets,
      }}>
         {children}
     </ExerciseContext.Provider>

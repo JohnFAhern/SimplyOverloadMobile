@@ -4,86 +4,85 @@ import { dashboardStyles as styles } from '../styles/dashboardStyles'
 import { Link, useRouter } from "expo-router"
 import AuthContext from './context/AuthContext'
 import ExerciseContext from './context/ExerciseContext'
-import CreateDayModal from './components/CreateDayModal'
+import CreateExerciseModal from './components/CreateExerciseModal'
 
 const Dashboard = () => {
 
   const [isModalVisible, setIsModalVisible] = useState(false)
   const [error, setError] = useState("")
-  const [newDayName, setNewDayName] = useState("")
-  const [days, setDays] = useState([])
+  const [newExerciseName, setNewExerciseName] = useState("")
+  const [exercises, setExercises] = useState([])
 
   const router = useRouter()
 
   const { currentUser } = useContext(AuthContext)
-  const { getDays, createDay } = useContext(ExerciseContext)
-
+  const { currentDay, setCurrentDay, getExercises, createExercise, } = useContext(ExerciseContext)
   useEffect(() => {
       if (!currentUser) return;  
 
-      getDays(currentUser)
+      getExercises(currentDay.day_id)
           .then(res => {
-              setDays(res.data.days);
+              setExercises(res.data.exercises);
           })
           .catch(err => {
-              setError(err ||"Couldn't load days");
+              setError(err ||"Couldn't load Exercises");
           });
 
     }, [currentUser]);
 
-    const handleCreateDay = async () =>{
+    const handleCreateExercise = async () =>{
         setError("")
-        if (days.some((d) => d.day_name === newDayName)) {
-            setError(`${newDayName} already exists!`);
+        if (exercises.some((e) => e.exercise_name === newExerciseName)) {
+            setError(`${newExerciseName} already exists!`);
             return;
         }
         try{
-            const res = await createDay(currentUser, newDayName);
+            const res = await createExercise(newExerciseName);
             console.log("Response from server:", res.data);
             if (res.data.status === "success"){
-                await getDays(currentUser).then((res) => {
-                    setDays(res.data.days);
+                await getExercises(currentDay.day_id).then((res) => {
+                    setExercises(res.data.exercises);
                 });
             }
         }catch(error){
-            console.log("Create Day:", error)
-            setError(error.response?.data?.message || "An error occurred during Create Day");
+            console.log("Create Exercise:", error)
+            setError(error.response?.data?.message || "An error occurred during Create Exercise");
         }
     }
 
   return (
     <View style={styles.container}>
-      <CreateDayModal
+      <CreateExerciseModal
         visible={isModalVisible}
         onClose={() => setIsModalVisible(false)}
-        handleCreateDay={handleCreateDay}
-        dayName={newDayName}
-        setDayName={setNewDayName}
+        handleCreateExercise={handleCreateExercise}
+        exerciseName={newExerciseName}
+        setExerciseName={setNewExerciseName}
         error={error}
       />
       <View style={styles.headerContainer}>
-          <Text style={styles.headerItem}>Days</Text>
+          <Text style={styles.headerItem}>{currentDay.day_name}</Text>
       </View>
-      {days == null ? (
+      {exercises == null ? (
         <Text>Loading</Text>
-      ) : days.length === 0 ? (
-        <Text> You Dont Have Any Days!</Text>
+      ) : exercises.length === 0 ? (
+        <Text> You Dont Have Any Exercises!</Text>
       ) : (
         <ScrollView 
           style={styles.boxContainer}
           contentContainerStyle={{ gap: 15, paddingVertical: 15 }}
         >
-          {days.map((day) => (
+          {exercises.map((exercise) => (
             <Pressable 
               style={styles.dayButtonContainer}
-              key={day.day_id}
+              key={exercise}
             >
               <Text 
                 style={styles.daysButtonText}
                 numberOfLines={1}
                 ellipsizeMode="tail"
               >
-                {day.day_name}
+                {exercise.exercise_name}
               </Text>
             </Pressable>
           ))}
@@ -94,10 +93,10 @@ const Dashboard = () => {
           style={styles.defaultButton}
           onPress={() => {
             setIsModalVisible(true)
-            console.log("Create day pressed")
+            console.log("Create Exercise pressed")
           }}
       >
-          <Text style={styles.defaultButtonText}>Create Day</Text> 
+          <Text style={styles.defaultButtonText}>Create Exercise</Text> 
       </Pressable>
 
 

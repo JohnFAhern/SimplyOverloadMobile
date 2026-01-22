@@ -2,6 +2,7 @@ import { View, Text, Pressable, TextInput, ScrollView, Modal } from 'react-nativ
 import React, { useState, useContext, useEffect } from 'react'
 import { dashboardStyles as styles } from '../styles/dashboardStyles'
 import { Link, useRouter } from "expo-router"
+import AsyncStorage from '@react-native-async-storage/async-storage'
 import AuthContext from './context/AuthContext'
 import ExerciseContext from './context/ExerciseContext'
 import CreateDayModal from './components/CreateDayModal'
@@ -51,8 +52,9 @@ const Dashboard = () => {
         }
     }
 
-    const handleDaySelect = (dayID) => {
-      setCurrentDay(dayID)
+    const handleDaySelect = async (day) => {
+      setCurrentDay(day)
+      await AsyncStorage.setItem("currentDay", JSON.stringify(day))
       router.push("/exercises")
     }
 
@@ -82,7 +84,7 @@ const Dashboard = () => {
             <Pressable 
               style={styles.dayButtonContainer}
               key={day.day_id}
-              onPress={handleDaySelect(day.day_id)}
+              onPress={() => handleDaySelect(day)}
             >
               <Text 
                 style={styles.daysButtonText}
