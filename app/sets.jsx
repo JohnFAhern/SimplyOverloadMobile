@@ -4,7 +4,7 @@ import { dashboardStyles as styles } from '../styles/dashboardStyles'
 import { Link, useRouter } from "expo-router"
 import AuthContext from './context/AuthContext'
 import ExerciseContext from './context/ExerciseContext'
-import CreateExerciseModal from './components/CreateExerciseModal'
+import CreateSetModal from './components/CreateSetModal'
 
 const Dashboard = () => {
 
@@ -21,7 +21,7 @@ const Dashboard = () => {
   const { currentUser } = useContext(AuthContext)
   const { currentDay, setCurrentDay, getExercises, createExercise, setCurrentExercise, currentExercise, getSets } = useContext(ExerciseContext)
   useEffect(() => {
-      if (!currentUser) return;  
+      if (!currentUser || !currentExercise) return;  
 
       getSets(currentExercise.exercise_id)
           .then(res => {
@@ -63,12 +63,14 @@ const Dashboard = () => {
         visible={isModalVisible}
         onClose={() => setIsModalVisible(false)}
         handleCreateSet={handleCreateSet}
-        weight={newExerciseName}
-        setExerciseName={setNewExerciseName}
+        weight={weight}
+        setWeight={setWeight}
+        reps ={reps}
+        setReps = {setReps}
         error={error}
       />
       <View style={styles.headerContainer}>
-          <Text style={styles.headerItem}>{currentExercise.exercise_name}</Text>
+          <Text style={styles.headerItem}>{currentExercise?.exercise_name || "Loading..."}</Text>
       </View>
       {sets == null ? (
         <Text>Loading</Text>

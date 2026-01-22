@@ -1,5 +1,6 @@
 import { View, Text, Pressable, TextInput, ScrollView, Modal } from 'react-native'
 import React, { useState, useContext, useEffect } from 'react'
+import AsyncStorage from '@react-native-async-storage/async-storage'
 import { dashboardStyles as styles } from '../styles/dashboardStyles'
 import { Link, useRouter } from "expo-router"
 import AuthContext from './context/AuthContext'
@@ -49,8 +50,9 @@ const Dashboard = () => {
             setError(error.response?.data?.message || "An error occurred during Create Exercise");
         }
     }
-    const handleExerciseSelect = (exercise) => {
+    const handleExerciseSelect = async (exercise) => {
       setCurrentExercise(exercise)
+      await AsyncStorage.setItem("currentExercise", JSON.stringify(exercise))
       router.push("/sets")
     }
 

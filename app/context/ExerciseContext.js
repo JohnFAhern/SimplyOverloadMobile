@@ -11,8 +11,11 @@ export function ExerciseProvider({children}) {
 
   useEffect(() => {
     const loadUserData = async () => {
-      const dayID = await AsyncStorage.getItem("dayID")
-      if(dayID) setCurrentDay(parseInt(dayID))
+      const storedDay = await AsyncStorage.getItem("currentDay")
+      if(storedDay) setCurrentDay(JSON.parse(storedDay))
+      
+      const storedExercise = await AsyncStorage.getItem("currentExercise")
+      if(storedExercise) setCurrentExercise(JSON.parse(storedExercise))
     }
     loadUserData()
   }, [])
