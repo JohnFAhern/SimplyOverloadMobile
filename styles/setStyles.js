@@ -1,6 +1,6 @@
 import { StyleSheet } from 'react-native';
 
-export const dashboardStyles = StyleSheet.create({
+export const setStyles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: "#F1F0E4",
@@ -57,7 +57,7 @@ export const dashboardStyles = StyleSheet.create({
         fontSize: 20,
     },
     headerContainer: {
-        height: "8%",
+        minHeight: "8%",
         justifyContent: "center",
         borderBottomColor: "#697565",
         borderBottomLeftRadius: 50,
@@ -87,7 +87,7 @@ export const dashboardStyles = StyleSheet.create({
     daysButtonText: {
         textAlign: "center",
         color: "white",
-        fontSize: 35,
+        fontSize: 25,
     },
     modalContainer: {
         width: "100%",

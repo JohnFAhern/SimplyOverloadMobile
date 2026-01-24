@@ -86,8 +86,6 @@ const Dashboard = () => {
             >
               <Text 
                 style={styles.daysButtonText}
-                numberOfLines={1}
-                ellipsizeMode="tail"
               >
                 {exercise.exercise_name}
               </Text>

@@ -55,7 +55,7 @@ export function ExerciseProvider({children}) {
   }
   function createSets(weight, reps){
     return axios.post("https://simplyoverload.com/api/createSets.php", {
-      exerciseID: currentExercise,
+      exerciseID: currentExercise?.exercise_id,
       reps,
       weight
     }, {

@@ -22,19 +22,31 @@ const CreateSetModal = ({ visible, onClose, handleCreateSet, weight, setWeight, 
         <View style={styles.boxContainer}>
           <View style={styles.labelAndTextContainer}>
             {error ? <Text style={styles.errorText}>{error}</Text> : null}
-            <Text style={styles.labelItem}>Create Exercise:</Text>
+            <Text style={styles.labelItem}>Enter Weight:</Text>
             <TextInput
               style={styles.textInputItem}
               value={weight}
               placeholder='Enter Weight:'
               onChangeText={setWeight}
+              keyboardType="numeric"
             />
           </View>
+          <View style={styles.labelAndTextContainer}>
+            <Text style={styles.labelItem}>Enter Reps:</Text>
+            <TextInput
+              style={styles.textInputItem}
+              value={reps}
+              placeholder='Enter Reps:'
+              onChangeText={setReps}
+              keyboardType="numeric"
+            />
+          </View>
+
           <Pressable 
             style={styles.defaultButton}
             onPress={handleSubmit}
           >
-            <Text style={styles.defaultButtonText}>Create Exercise</Text>
+            <Text style={styles.defaultButtonText}>Enter Set</Text>
           </Pressable>
         </View>
         <Pressable 

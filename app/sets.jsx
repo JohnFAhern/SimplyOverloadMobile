@@ -1,6 +1,6 @@
 import { View, Text, Pressable, TextInput, ScrollView, Modal } from 'react-native'
 import React, { useState, useContext, useEffect } from 'react'
-import { dashboardStyles as styles } from '../styles/dashboardStyles'
+import { setStyles as styles } from '../styles/setStyles'
 import { Link, useRouter } from "expo-router"
 import AuthContext from './context/AuthContext'
 import ExerciseContext from './context/ExerciseContext'
@@ -10,8 +10,6 @@ const Dashboard = () => {
 
   const [isModalVisible, setIsModalVisible] = useState(false)
   const [error, setError] = useState("")
-  const [newExerciseName, setNewExerciseName] = useState("")
-  const [exercises, setExercises] = useState([])
   const[sets, setSets] = useState([])
   const [weight, setWeight] = useState(0)
   const [reps, setReps] = useState(0)
@@ -19,7 +17,7 @@ const Dashboard = () => {
   const router = useRouter()
 
   const { currentUser } = useContext(AuthContext)
-  const { currentDay, setCurrentDay, getExercises, createExercise, setCurrentExercise, currentExercise, getSets } = useContext(ExerciseContext)
+  const { currentDay, setCurrentDay, getExercises, createExercise, setCurrentExercise, currentExercise, getSets, createSets } = useContext(ExerciseContext)
   useEffect(() => {
       if (!currentUser || !currentExercise) return;  
 
@@ -35,21 +33,20 @@ const Dashboard = () => {
 
     const handleCreateSet = async () =>{
         setError("")
-        if (exercises.some((e) => e.exercise_name === newExerciseName)) {
-            setError(`${newExerciseName} already exists!`);
-            return;
-        }
         try{
-            const res = await createExercise(newExerciseName);
-            console.log("Response from server:", res.data);
-            if (res.data.status === "success"){
-                await getExercises(currentDay.day_id).then((res) => {
-                    setExercises(res.data.exercises);
-                });
-            }
-        }catch(error){
-            console.log("Create Exercise:", error)
-            setError(error.response?.data?.message || "An error occurred during Create Exercise");
+            const res = await createSets(weight, reps);
+            console.log("Create set response:", res.data);
+          if (res.data.status === "success") {
+            const newRes = await getSets(currentExercise.exercise_id);
+            console.log("Refreshed sets:", newRes.data);
+            setSets(newRes.data.sets || []);
+
+            setWeight(0);
+            setReps(0);
+          }
+        } catch(error){
+            console.log("Create Set:", error)
+            setError(error.response?.data?.message || "An error occurred during Create Set");
         }
     }
     const handleExerciseSelect = (exercise) => {
@@ -70,7 +67,9 @@ const Dashboard = () => {
         error={error}
       />
       <View style={styles.headerContainer}>
-          <Text style={styles.headerItem}>{currentExercise?.exercise_name || "Loading..."}</Text>
+          <Text style={[styles.headerItem, { flexWrap: 'wrap' }]} numberOfLines={0}>
+            {currentExercise?.exercise_name || "Loading..."}
+          </Text>
       </View>
       {sets == null ? (
         <Text>Loading</Text>
@@ -81,18 +80,30 @@ const Dashboard = () => {
           style={styles.boxContainer}
           contentContainerStyle={{ gap: 15, paddingVertical: 15 }}
         >
-          {exercises.map((set) => (
+          {sets.map((set) => (
             <Pressable 
               style={styles.dayButtonContainer}
-              key={exercise.exercise_id}
-              onPress={() => handleExerciseSelect(exercise.exercise_id)}
+              key={set.set_entry_id}
             >
               <Text 
                 style={styles.daysButtonText}
                 numberOfLines={1}
                 ellipsizeMode="tail"
               >
-                Weight: {set.weight}
+                Date: {new Date(set.created_at).toLocaleDateString()}
+              </Text>
+              <Text 
+                style={styles.daysButtonText}
+                numberOfLines={1}
+                ellipsizeMode="tail"
+              >
+                Weight: {set.weight} lbs
+              </Text>
+              <Text 
+                style={styles.daysButtonText}
+                numberOfLines={1}
+                ellipsizeMode="tail"
+              >
                 Reps: {set.reps}
               </Text>
             </Pressable>
@@ -104,10 +115,10 @@ const Dashboard = () => {
           style={styles.defaultButton}
           onPress={() => {
             setIsModalVisible(true)
-            console.log("Create Exercise pressed")
+            console.log("Create Sets pressed")
           }}
       >
-          <Text style={styles.defaultButtonText}>Create Exercise</Text> 
+          <Text style={styles.defaultButtonText}>Enter Set</Text> 
       </Pressable>
 
 
@@ -117,3 +128,4 @@ const Dashboard = () => {
 }
 
 export default Dashboard
+
