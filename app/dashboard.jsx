@@ -9,7 +9,7 @@ import CreateDayModal from './components/CreateDayModal'
 const Dashboard = () => {
 
   const [isModalVisible, setIsModalVisible] = useState(false)
-  const [error, setError] = useState("")
+  const [error, setError] = useState(null)
   const [newDayName, setNewDayName] = useState("")
   const [days, setDays] = useState([])
 
@@ -19,7 +19,7 @@ const Dashboard = () => {
   const { getDays, createDay, currentDay, setCurrentDay, currentExercise } = useContext(ExerciseContext)
 
   useEffect(() => {
-      if (!currentUser) return;  
+      if (!currentUser || currentUser === 0) return;  
 
       getDays(currentUser)
           .then(res => {
@@ -64,7 +64,7 @@ const Dashboard = () => {
         handleCreateDay={handleCreateDay}
         dayName={newDayName}
         setDayName={setNewDayName}
-        error={error}
+        //error={error}
       />
       <View style={styles.headerContainer}>
           <Text style={styles.headerItem}>Days</Text>

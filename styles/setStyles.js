@@ -6,7 +6,6 @@ export const setStyles = StyleSheet.create({
         backgroundColor: "#F1F0E4",
         height: "100%",
         alignItems: "center",
-        justifyContent: "center",
         padding: 10,
         gap: 10
         
@@ -35,7 +34,7 @@ export const setStyles = StyleSheet.create({
     boxContainer: {
         flex: 1,
         alignSelf: "center",
-        width: "95%",
+        width: "100%",
         borderWidth: 2,
         borderColor: "#7D8D86",
         borderRadius: 50,
@@ -100,5 +99,36 @@ export const setStyles = StyleSheet.create({
         justifyContent: "center",
         alignContent: "center",
         padding: 20,
-    }
+    },
+    displaySessionsButton: {
+        height: 70,
+        width: "90%",
+        backgroundColor: "#7D8D86",
+        borderRadius: 50,
+        borderWidth: 2,
+        borderColor: "#F3EEE2",
+        justifyContent: "center",
+        alignSelf: "center",
+    },
+        testContainer: {
+        flex: 1,
+        backgroundColor: "#F1F0E4",
+        height: "10%",
+        alignItems: "center",
+        justifyContent: "center",
+        padding: 10,
+        gap: 10
+        
+    },
+    PersonalBestContainer: {
+        minHeight: 130,
+        width: "90%",
+        backgroundColor: "#7D8D86",
+        borderRadius: 50,
+        borderWidth: 2,
+        borderColor: "#F3EEE2",
+        justifyContent: "center",
+        alignSelf: "center",
+        paddingVertical: 15
+    },
 });

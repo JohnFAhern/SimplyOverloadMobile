@@ -5,29 +5,48 @@ import { Link, useRouter } from "expo-router"
 import AuthContext from './context/AuthContext'
 import ExerciseContext from './context/ExerciseContext'
 import CreateSetModal from './components/CreateSetModal'
+import ShowSessionButton from './components/showSessionButton'
+import ShowPersonalBestButton from './components/showPersonalBestButton'
 
 const Dashboard = () => {
 
   const [isModalVisible, setIsModalVisible] = useState(false)
   const [error, setError] = useState("")
-  const[sets, setSets] = useState([])
+  const [sets, setSets] = useState([])
+  const [todaysSession, setTodaysSession] = useState(null)
+  const [isTodaysSessionVisible, setIsTodaysSessionVisible] = useState(false)
+  const [lastSession, setLastSession] = useState(null)
+  const [isLastSessionVisible, setIsLastSessionVisible] = useState(true)
+  const [isPreviousSessionsVisible, setIsPreviousSessionsVisible] = useState(false)
+  const [previousSessions, setPreviousSessions] = useState(null)
+  const [allTimeHigh, setAllTimeHigh] = useState(null)
+  const [lastSessionHigh, setLastSessionHigh] = useState(null)
   const [weight, setWeight] = useState(0)
   const [reps, setReps] = useState(0)
+  const [isPersonalBestVisible, setIsPersonalBestVisible] = useState(false)
 
   const router = useRouter()
 
   const { currentUser } = useContext(AuthContext)
-  const { currentDay, setCurrentDay, getExercises, createExercise, setCurrentExercise, currentExercise, getSets, createSets } = useContext(ExerciseContext)
+  const { setCurrentExercise, currentExercise, getSets, createSets } = useContext(ExerciseContext)
   useEffect(() => {
       if (!currentUser || !currentExercise) return;  
 
       getSets(currentExercise.exercise_id)
           .then(res => {
-              setSets(res.data.sets);
+              console.log("Backend response:", res.data);
+              console.log("todaysSession:", res.data.todaySession);
+              setTodaysSession(res.data.todaySession)
+              setLastSession(res.data.lastSession);
+              setPreviousSessions(res.data.previousSessions);
+              setAllTimeHigh(res.data.allTimeHigh)
+              setLastSessionHigh(res.data.lastSessionHigh)
+            
           })
           .catch(err => {
               setError(err ||"Couldn't load Sets");
           });
+
 
     }, [currentExercise]);
 
@@ -49,10 +68,6 @@ const Dashboard = () => {
             setError(error.response?.data?.message || "An error occurred during Create Set");
         }
     }
-    const handleExerciseSelect = (exercise) => {
-      setCurrentExercise(exercise)
-      router.push("/sets")
-    }
 
   return (
     <View style={styles.container}>
@@ -70,47 +85,42 @@ const Dashboard = () => {
           <Text style={[styles.headerItem, { flexWrap: 'wrap' }]} numberOfLines={0}>
             {currentExercise?.exercise_name || "Loading..."}
           </Text>
+          
       </View>
-      {sets == null ? (
-        <Text>Loading</Text>
-      ) : sets.length === 0 ? (
-        <Text> You Dont Have Any Sets!</Text>
-      ) : (
-        <ScrollView 
-          style={styles.boxContainer}
-          contentContainerStyle={{ gap: 15, paddingVertical: 15 }}
-        >
-          {sets.map((set) => (
-            <Pressable 
-              style={styles.dayButtonContainer}
-              key={set.set_entry_id}
-            >
-              <Text 
-                style={styles.daysButtonText}
-                numberOfLines={1}
-                ellipsizeMode="tail"
-              >
-                Date: {new Date(set.created_at).toLocaleDateString()}
-              </Text>
-              <Text 
-                style={styles.daysButtonText}
-                numberOfLines={1}
-                ellipsizeMode="tail"
-              >
-                Weight: {set.weight} lbs
-              </Text>
-              <Text 
-                style={styles.daysButtonText}
-                numberOfLines={1}
-                ellipsizeMode="tail"
-              >
-                Reps: {set.reps}
-              </Text>
-            </Pressable>
-          ))}
-        </ScrollView>
-      )
-      }
+
+      
+      <ScrollView 
+        style={{ flex: 1, width: '100%' }}
+        contentContainerStyle={{ gap: 10, paddingVertical: 10 }}
+      >
+        <ShowPersonalBestButton
+          title="Personal Best"
+          allTimeHigh = {allTimeHigh}
+          lastSessionHigh = {lastSessionHigh}
+          isVisible={isPersonalBestVisible}
+          setVisibility={setIsPersonalBestVisible}
+        />
+        <ShowSessionButton
+          title="Todays Session"
+          sessionArray={todaysSession}
+          isVisible={isTodaysSessionVisible}
+          setVisibility={setIsTodaysSessionVisible}
+        />
+        <ShowSessionButton
+          title="Last Session"
+          sessionArray={lastSession}
+          isVisible={isLastSessionVisible}
+          setVisibility={setIsLastSessionVisible}
+        />
+
+        <ShowSessionButton
+          title="Previous Sessions"
+          sessionArray={previousSessions}
+          isVisible={isPreviousSessionsVisible}
+          setVisibility={setIsPreviousSessionsVisible}
+        />
+      </ScrollView>
+
       <Pressable 
           style={styles.defaultButton}
           onPress={() => {

@@ -1,6 +1,7 @@
 import React, { createContext, useState, useEffect } from 'react'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import axios from 'axios'
+import { Platform } from 'react-native'
 
 const AuthContext = createContext(null)
 
@@ -20,15 +21,10 @@ export function AuthProvider({children}) {
     await AsyncStorage.setItem("userID", userID.toString())
   }
 
+  const API_HOST = Platform.OS === 'android' ? 'http://10.0.2.2:3000' : 'http://localhost:3000'
+
   const login =(email, password) => {
-    return axios.post("https://simplyoverload.com/api/login.php", {
-      email,
-      password
-    }, {
-      headers: {
-        'Content-Type': 'application/json'
-      }
-    })
+    return axios.post(`${API_HOST}/users/login`, { email, password }, { headers: { 'Content-Type': 'application/json' } })
   }
 
   const logout = async () =>{
@@ -37,14 +33,7 @@ export function AuthProvider({children}) {
   }
 
  const register = (email, password) => {
-    return axios.post("https://simplyoverload.com/api/register.php", {
-      email,
-      password
-    }, {
-      headers: {
-        'Content-Type': 'application/json'
-      }
-    })
+    return axios.post(`${API_HOST}/users/register`, { email, password }, { headers: { 'Content-Type': 'application/json' } })
   }
 
   return (

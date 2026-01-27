@@ -2,7 +2,7 @@ import { View, Text, Pressable, TextInput, Modal } from 'react-native'
 import React from 'react'
 import { dashboardStyles as styles } from '../../styles/dashboardStyles'
 
-const CreateExerciseModal = ({ visible, onClose, handleCreateExercise, exerciseName, setExerciseName, error}) => {
+const CreateExerciseModal = ({ visible, onClose, handleCreateExercise, exerciseName, setExerciseName}) => {
   
   const handleSubmit = async () => {
     await handleCreateExercise()
@@ -20,7 +20,7 @@ const CreateExerciseModal = ({ visible, onClose, handleCreateExercise, exerciseN
       <View style={styles.modalContainer}>
         <View style={styles.boxContainer}>
           <View style={styles.labelAndTextContainer}>
-            {error ? <Text style={styles.errorText}>{error}</Text> : null}
+            
             <Text style={styles.labelItem}>Create Exercise:</Text>
             <TextInput
               style={styles.textInputItem}

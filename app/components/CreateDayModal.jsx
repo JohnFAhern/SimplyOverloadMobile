@@ -2,7 +2,7 @@ import { View, Text, Pressable, TextInput, Modal } from 'react-native'
 import React from 'react'
 import { dashboardStyles as styles } from '../../styles/dashboardStyles'
 
-const CreateDayModal = ({ visible, onClose, handleCreateDay, dayName, setDayName, error}) => {
+const CreateDayModal = ({ visible, onClose, handleCreateDay, dayName, setDayName}) => {
   
   const handleSubmit = async () => {
     await handleCreateDay()
@@ -20,7 +20,7 @@ const CreateDayModal = ({ visible, onClose, handleCreateDay, dayName, setDayName
       <View style={styles.modalContainer}>
         <View style={styles.boxContainer}>
           <View style={styles.labelAndTextContainer}>
-            {error ? <Text style={styles.errorText}>{error}</Text> : null}
+            
             <Text style={styles.labelItem}>Create Day:</Text>
             <TextInput
               style={styles.textInputItem}
