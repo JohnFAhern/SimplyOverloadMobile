@@ -2,12 +2,13 @@ import { View, Text, Pressable, ScrollView } from 'react-native'
 import React from 'react'
 import { setStyles as styles } from '../../styles/setStyles'
 
-const ShowSessionButton = ({ title, sessionArray, isVisible, setVisibility }) => {
+const ShowSessionButton = ({ title, sessionArray, isVisible, setVisibility, setToEdit, setSetToEdit, setIsEditModalVisible, setWeight, setReps }) => {
   return (
     <View style={styles.testContainer}>
         <Pressable 
             style={styles.displaySessionsButton}
             onPress={() => setVisibility(!isVisible)}
+            
         >
             <Text style={styles.defaultButtonText}>{title} {isVisible ? '-' : '+'}</Text> 
         </Pressable>
@@ -15,8 +16,8 @@ const ShowSessionButton = ({ title, sessionArray, isVisible, setVisibility }) =>
           <View style={{ width: '100%' }}>
             {sessionArray == null || sessionArray === undefined ? (
               <Text>Loading</Text>
-            ) : Array.isArray(sessionArray) && sessionArray.length === 0 ? (
-              <Text>You Don't Have Any Sets!</Text>
+            ) : Object.keys(sessionArray).length === 0 ? (
+              <Text style={{textAlign: 'center'}}>You Don't Have Any Sets!</Text>
             ) : Array.isArray(sessionArray) && sessionArray.length > 0 ? (
               <ScrollView 
                 style={[styles.boxContainer, { flex: 0, maxHeight: 300 }]}
@@ -26,6 +27,7 @@ const ShowSessionButton = ({ title, sessionArray, isVisible, setVisibility }) =>
                   <Pressable 
                     style={styles.dayButtonContainer}
                     key={set.set_entry_id || `set-${index}`}
+                    onLongPress={() => {console.log("long press")}}
                   >
                     <Text 
                       style={styles.daysButtonText}
@@ -65,6 +67,14 @@ const ShowSessionButton = ({ title, sessionArray, isVisible, setVisibility }) =>
                       <Pressable 
                         style={styles.dayButtonContainer}
                         key={set.set_entry_id || `${date}-set-${index}`}
+                        onLongPress={() => {
+                            console.log("Edit Set Modal")
+                            setSetToEdit(set)
+                            setWeight(set.weight)
+                            setReps(set.reps)
+                            setIsEditModalVisible(true)
+                            
+                        }}
                       >
                         <Text 
                           style={styles.daysButtonText}

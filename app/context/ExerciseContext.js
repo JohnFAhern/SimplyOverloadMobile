@@ -49,6 +49,16 @@ export function ExerciseProvider({children}) {
       params: { userID }
     });
   }
+  const updateDayName = (dayID, newDayName) =>{
+    return axios.post(`${API_HOST}/exercises/updateDayName`, {
+      dayID,
+      newDayName
+    }, {
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    })
+  }
 
   const createExercise = (exerciseName) => {
     return axios.post(`${API_HOST}/exercises/createExercise`, {
@@ -66,6 +76,20 @@ export function ExerciseProvider({children}) {
       params: { dayID }
     });
   }
+
+  const updateExerciseName = (exerciseID, newExerciseName) =>{
+    return axios.post(`${API_HOST}/exercises/updateExerciseName`, {
+      exerciseID,
+      newExerciseName
+    }, {
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    })
+  }
+
+
+
   function createSets(weight, reps){
     return axios.post(`${API_HOST}/exercises/createSet`, {
       exerciseID: currentExercise?.exercise_id,
@@ -89,6 +113,20 @@ export function ExerciseProvider({children}) {
       */
     });
   }
+  const updateSet = (setID, weight, reps) =>{
+    console.log(`${setID} - setID, ${weight} - weight, ${reps}`)
+    const path = `${API_HOST}/exercises/updateSet`
+    console.log(`Sending Request to: ${path}`)
+    return axios.post(path, {
+      setID,
+      weight,
+      reps
+    }, {
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    })
+  }
 
 
   return (
@@ -99,10 +137,13 @@ export function ExerciseProvider({children}) {
       setCurrentExercise,
       createDay,
       getDays,
+      updateDayName,
       createExercise,
       getExercises,
+      updateExerciseName,
       getSets,
       createSets,
+      updateSet,
      }}>
         {children}
     </ExerciseContext.Provider>

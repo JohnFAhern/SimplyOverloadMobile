@@ -2,12 +2,12 @@ import { View, Text, Pressable, TextInput, Modal } from 'react-native'
 import React from 'react'
 import { dashboardStyles as styles } from '../../styles/dashboardStyles'
 
-const CreateDayModal = ({ visible, onClose, handleCreateDay, dayName, setDayName}) => {
+const UpdateDayModal = ({ visible, onClose, handleUpdateSDay, dayToEdit, setDayToEdit, newDayName, setNewDayName, error}) => {
   
   const handleSubmit = async () => {
-    await handleCreateDay()
+    await handleUpdateDay()
     onClose()
-    setDayName("")
+    setNewDayName("")
   }
 
   return (
@@ -19,24 +19,25 @@ const CreateDayModal = ({ visible, onClose, handleCreateDay, dayName, setDayName
     >
       <View style={styles.modalContainer}>
         <View style={styles.headerContainer}>
-            <Text style={styles.headerItem}>Create Day</Text>
+            <Text style={styles.headerItem}>Update Day</Text>
         </View>
         <View style={styles.boxContainer}>
           <View style={styles.labelAndTextContainer}>
-            
-            <Text style={styles.labelItem}>Create Day:</Text>
+            {error ? <Text style={styles.errorText}>{error}</Text> : null}
+            <Text style={styles.labelItem}>Enter Day Name:</Text>
             <TextInput
               style={styles.textInputItem}
-              value={dayName}
-              placeholder='Enter Day Name:'
-              onChangeText={setDayName}
+              value={newDayName || ''}
+              placeholder='Update Day Name :'
+              onChangeText={(text) => setNewDayName(text || "")}
             />
           </View>
+
           <Pressable 
             style={styles.defaultButton}
             onPress={handleSubmit}
           >
-            <Text style={styles.defaultButtonText}>Create Day</Text>
+            <Text style={styles.defaultButtonText}>Update Set</Text>
           </Pressable>
         </View>
         <Pressable 
@@ -50,4 +51,4 @@ const CreateDayModal = ({ visible, onClose, handleCreateDay, dayName, setDayName
   )
 }
 
-export default CreateDayModal
+export default UpdateDayModal

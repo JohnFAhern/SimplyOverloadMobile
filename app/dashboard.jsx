@@ -5,6 +5,7 @@ import { Link, useRouter } from "expo-router"
 import AuthContext from './context/AuthContext'
 import ExerciseContext from './context/ExerciseContext'
 import CreateDayModal from './components/CreateDayModal'
+import UpdateDayModal from './components/updateDayModal'
 
 const Dashboard = () => {
 
@@ -12,6 +13,8 @@ const Dashboard = () => {
   const [error, setError] = useState(null)
   const [newDayName, setNewDayName] = useState("")
   const [days, setDays] = useState([])
+  const [isEditModalVisible, setIsEditModalVisible] = useState(false)
+  const [dayToEdit, setDayToEdit] = useState(null)
 
   const router = useRouter()
 
@@ -56,6 +59,27 @@ const Dashboard = () => {
       router.push("/exercises")
     }
 
+    const handleUpdateDay = async () =>{
+      setError("")
+      if (!dayToEdit?.set_entry_id) {
+          setError("No set selected to update")
+          return
+      }
+      try{
+          const res = await updateSet(dayToEdit.day_id, newDayName);
+          console.log("Update set response:", res.data);
+        if (res.data.status === "success") {
+          const newRes = await handleGetSets
+          console.log("Refreshed sets:", newRes.data);
+          setSets(newRes.data.sets || []);
+
+        }
+      } catch(error){
+          console.log("Create Set:", error)
+          setError(error.response?.data?.message || "An error occurred during Create Set");
+      }
+  }
+
   return (
     <View style={styles.container}>
       <CreateDayModal
@@ -66,6 +90,22 @@ const Dashboard = () => {
         setDayName={setNewDayName}
         //error={error}
       />
+
+
+      <UpdateDayModal
+        visible={isEditModalVisible}
+        onClose={() => setIsEditModalVisible(false)}
+        handleUpdateDay={handleUpdateDay}
+        dayName={newDayName}
+        setNewDayName={setNewDayName}
+        error={error}
+        dayToEdit={dayToEdit}
+        setDayToEdit={setDayToEdit}
+      />
+
+
+
+
       <View style={styles.headerContainer}>
           <Text style={styles.headerItem}>Days</Text>
       </View>
@@ -83,6 +123,14 @@ const Dashboard = () => {
               style={styles.dayButtonContainer}
               key={day.day_id}
               onPress={() => handleDaySelect(day)}
+              onLongPress={() => {
+                console.log("long")
+                setDayToEdit(day)
+                setNewDayName(day.day_name)
+                setIsEditModalVisible(true)
+              }}
+              
+              
             >
               <Text 
                 style={styles.daysButtonText}
@@ -99,6 +147,7 @@ const Dashboard = () => {
       <Pressable 
           style={styles.defaultButton}
           onPress={() => {
+            setNewDayName("")
             setIsModalVisible(true)
             console.log("Create day pressed")
           }}

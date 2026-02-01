@@ -5,6 +5,7 @@ import { Link, useRouter } from "expo-router"
 import AuthContext from './context/AuthContext'
 import ExerciseContext from './context/ExerciseContext'
 import CreateSetModal from './components/CreateSetModal'
+import UpdateSetModal from './components/updateSetModal'
 import ShowSessionButton from './components/showSessionButton'
 import ShowPersonalBestButton from './components/showPersonalBestButton'
 
@@ -23,29 +24,37 @@ const Dashboard = () => {
   const [lastSessionHigh, setLastSessionHigh] = useState(null)
   const [weight, setWeight] = useState(0)
   const [reps, setReps] = useState(0)
-  const [isPersonalBestVisible, setIsPersonalBestVisible] = useState(false)
+  const [setToEdit, setSetToEdit] = useState(null)
+  const [isPersonalBestVisible, setIsPersonalBestVisible] = useState(true)
+  const [isEditModalVisible, setIsEditModalVisible] = useState(false)
 
   const router = useRouter()
 
   const { currentUser } = useContext(AuthContext)
-  const { setCurrentExercise, currentExercise, getSets, createSets } = useContext(ExerciseContext)
+  const { setCurrentExercise, currentExercise, getSets, createSets, updateSet } = useContext(ExerciseContext)
+
+  const handleGetSets = async () => {
+    
+      try{
+          const res = await getSets(currentExercise.exercise_id)
+          console.log("Backend response:", res.data);
+          console.log("todaysSession:", res.data.todaySession);
+          setTodaysSession(res.data.todaySession)
+          setLastSession(res.data.lastSession);
+          setPreviousSessions(res.data.previousSessions);
+          setAllTimeHigh(res.data.allTimeHigh)
+          setLastSessionHigh(res.data.lastSessionHigh)
+        
+      }catch(err) {
+          setError(err ||"Couldn't load Sets");
+      };
+
+  }
+
   useEffect(() => {
       if (!currentUser || !currentExercise) return;  
 
-      getSets(currentExercise.exercise_id)
-          .then(res => {
-              console.log("Backend response:", res.data);
-              console.log("todaysSession:", res.data.todaySession);
-              setTodaysSession(res.data.todaySession)
-              setLastSession(res.data.lastSession);
-              setPreviousSessions(res.data.previousSessions);
-              setAllTimeHigh(res.data.allTimeHigh)
-              setLastSessionHigh(res.data.lastSessionHigh)
-            
-          })
-          .catch(err => {
-              setError(err ||"Couldn't load Sets");
-          });
+      handleGetSets()
 
 
     }, [currentExercise]);
@@ -56,7 +65,31 @@ const Dashboard = () => {
             const res = await createSets(weight, reps);
             console.log("Create set response:", res.data);
           if (res.data.status === "success") {
-            const newRes = await getSets(currentExercise.exercise_id);
+            await getSets(currentExercise.exercise_id);
+            //console.log("Refreshed sets:", newRes.data);
+            setSets(newRes.data.sets || []);
+
+            setWeight(0);
+            setReps(0);
+          }
+        } catch(error){
+            console.log("Create Set:", error)
+            setError(error.response?.data?.message || "An error occurred during Create Set");
+        }
+    }
+    const handleUpdateSet = async () =>{
+        setError("")
+        console.log("setToEdit:", setToEdit)
+        console.log("setToEdit.set_entry_id:", setToEdit?.set_entry_id)
+        if (!setToEdit?.set_entry_id) {
+            setError("No set selected to update")
+            return
+        }
+        try{
+            const res = await updateSet(setToEdit.set_entry_id, weight, reps);
+            console.log("Update set response:", res.data);
+          if (res.data.status === "success") {
+            const newRes = await handleGetSets
             console.log("Refreshed sets:", newRes.data);
             setSets(newRes.data.sets || []);
 
@@ -69,6 +102,8 @@ const Dashboard = () => {
         }
     }
 
+    
+
   return (
     <View style={styles.container}>
       <CreateSetModal
@@ -80,6 +115,21 @@ const Dashboard = () => {
         reps ={reps}
         setReps = {setReps}
         error={error}
+        setToEdit={setToEdit}
+        setSetToEdit={setSetToEdit}
+        setIsEditModalVisible={setIsEditModalVisible}
+      />
+      <UpdateSetModal
+        visible={isEditModalVisible}
+        onClose={() => setIsEditModalVisible(false)}
+        handleUpdateSet={handleUpdateSet}
+        weight={weight}
+        setWeight={setWeight}
+        reps ={reps}
+        setReps = {setReps}
+        error={error}
+        setToEdit={setToEdit}
+        setSetToEdit={setSetToEdit}
       />
       <View style={styles.headerContainer}>
           <Text style={[styles.headerItem, { flexWrap: 'wrap' }]} numberOfLines={0}>
@@ -105,12 +155,22 @@ const Dashboard = () => {
           sessionArray={todaysSession}
           isVisible={isTodaysSessionVisible}
           setVisibility={setIsTodaysSessionVisible}
+          setToEdit={setToEdit}
+          setSetToEdit={setSetToEdit}
+          setIsEditModalVisible={setIsEditModalVisible}
+          setWeight={setWeight}
+          setReps={setReps}
         />
         <ShowSessionButton
           title="Last Session"
           sessionArray={lastSession}
           isVisible={isLastSessionVisible}
           setVisibility={setIsLastSessionVisible}
+          setToEdit={setToEdit}
+          setSetToEdit={setSetToEdit}
+          setIsEditModalVisible={setIsEditModalVisible}
+          setWeight={setWeight}
+          setReps={setReps}
         />
 
         <ShowSessionButton
@@ -118,6 +178,11 @@ const Dashboard = () => {
           sessionArray={previousSessions}
           isVisible={isPreviousSessionsVisible}
           setVisibility={setIsPreviousSessionsVisible}
+          setToEdit={setToEdit}
+          setSetToEdit={setSetToEdit}
+          setIsEditModalVisible={setIsEditModalVisible}
+          setWeight={setWeight}
+          setReps={setReps}
         />
       </ScrollView>
 

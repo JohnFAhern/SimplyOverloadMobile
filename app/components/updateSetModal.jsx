@@ -2,10 +2,10 @@ import { View, Text, Pressable, TextInput, Modal } from 'react-native'
 import React from 'react'
 import { dashboardStyles as styles } from '../../styles/dashboardStyles'
 
-const CreateSetModal = ({ visible, onClose, handleCreateSet, weight, setWeight, reps, setReps, error}) => {
+const UpdateSetModal = ({ visible, onClose, handleUpdateSet, weight, setWeight, reps, setReps, error, set}) => {
   
   const handleSubmit = async () => {
-    await handleCreateSet()
+    await handleUpdateSet()
     onClose()
     setWeight(0)
     setReps(0)
@@ -19,18 +19,18 @@ const CreateSetModal = ({ visible, onClose, handleCreateSet, weight, setWeight, 
       presentationStyle='formSheet'
     >
       <View style={styles.modalContainer}>
-          <View style={styles.headerContainer}>
-              <Text style={styles.headerItem}>Enter Set</Text>
-          </View>
+        <View style={styles.headerContainer}>
+            <Text style={styles.headerItem}>Update Set</Text>
+        </View>
         <View style={styles.boxContainer}>
           <View style={styles.labelAndTextContainer}>
             {error ? <Text style={styles.errorText}>{error}</Text> : null}
             <Text style={styles.labelItem}>Enter Weight:</Text>
             <TextInput
               style={styles.textInputItem}
-              value={weight}
+              value={weight?.toString() || ''}
               placeholder='Enter Weight:'
-              onChangeText={setWeight}
+              onChangeText={(text) => setWeight(Number(text) || 0)}
               keyboardType="numeric"
             />
           </View>
@@ -38,9 +38,9 @@ const CreateSetModal = ({ visible, onClose, handleCreateSet, weight, setWeight, 
             <Text style={styles.labelItem}>Enter Reps:</Text>
             <TextInput
               style={styles.textInputItem}
-              value={reps}
+              value={reps?.toString() || ''}
               placeholder='Enter Reps:'
-              onChangeText={setReps}
+              onChangeText={(text) => setReps(Number(text) || 0)}
               keyboardType="numeric"
             />
           </View>
@@ -49,7 +49,7 @@ const CreateSetModal = ({ visible, onClose, handleCreateSet, weight, setWeight, 
             style={styles.defaultButton}
             onPress={handleSubmit}
           >
-            <Text style={styles.defaultButtonText}>Enter Set</Text>
+            <Text style={styles.defaultButtonText}>Update Set</Text>
           </Pressable>
         </View>
         <Pressable 
@@ -63,4 +63,4 @@ const CreateSetModal = ({ visible, onClose, handleCreateSet, weight, setWeight, 
   )
 }
 
-export default CreateSetModal
+export default UpdateSetModal
