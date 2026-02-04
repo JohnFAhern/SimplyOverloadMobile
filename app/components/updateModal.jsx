@@ -2,12 +2,21 @@ import { View, Text, Pressable, TextInput, Modal } from 'react-native'
 import React from 'react'
 import { dashboardStyles as styles } from '../../styles/dashboardStyles'
 
-const UpdateDayModal = ({ visible, onClose, handleUpdateDay, dayToEdit, setDayToEdit, newDayName, setNewDayName, error}) => {
+const UpdateModal = ({ visible, onClose, error, title, setErrors, objToEdit, setObjToEdit, variables, updateFunction }) => {
+  /*
+        visible={isEditModalVisible}
+        title={"Update Day"}
+        errors={errors}
+        setErrors={setErrors}
+        objToEdit={dayToEdit}
+        setObjToEdit={setDayToEdit}
+        variables = {[["Day", newDayName, setNewDayName]]}
+  */
   
   const handleSubmit = async () => {
-    await handleUpdateDay()
+    console.log("handling submit")
+    await updateFunction()
     onClose()
-    setNewDayName("")
   }
 
   return (
@@ -19,18 +28,32 @@ const UpdateDayModal = ({ visible, onClose, handleUpdateDay, dayToEdit, setDayTo
     >
       <View style={styles.modalContainer}>
         <View style={styles.headerContainer}>
-            <Text style={styles.headerItem}>Update Day</Text>
+            <Text style={styles.headerItem}>{title}</Text>
         </View>
         <View style={styles.boxContainer}>
           <View style={styles.labelAndTextContainer}>
             {error ? <Text style={styles.errorText}>{error}</Text> : null}
-            <Text style={styles.labelItem}>Enter Day Name:</Text>
+            {variables.map((vars, index) => (
+            <>
+              <Text style={styles.labelItem}>{vars[0]}</Text>
+              <TextInput
+                style={styles.textInputItem}
+                value={vars[2] || null}
+                placeholder={vars[1]}
+                onChangeText={(text) => vars[3](text)}
+              />
+            </>
+            ))}
+
+{    /* ["Update Day Name:", "Enter Updated Name:", newDayName, setNewDayName]
+            <Text style={styles.labelItem}>currTitle:</Text>
             <TextInput
               style={styles.textInputItem}
               value={newDayName || ""}
               placeholder='Update Day Name :'
               onChangeText={(text) => setNewDayName(text)}
             />
+*/}
           </View>
 
           <Pressable 
@@ -51,4 +74,4 @@ const UpdateDayModal = ({ visible, onClose, handleUpdateDay, dayToEdit, setDayTo
   )
 }
 
-export default UpdateDayModal
+export default UpdateModal

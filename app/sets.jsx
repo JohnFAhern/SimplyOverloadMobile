@@ -57,7 +57,7 @@ const Dashboard = () => {
       handleGetSets()
 
 
-    }, [currentExercise]);
+    }, [currentExercise, setToEdit]);
 
     const handleCreateSet = async () =>{
         setError("")
@@ -89,12 +89,12 @@ const Dashboard = () => {
             const res = await updateSet(setToEdit.set_entry_id, weight, reps);
             console.log("Update set response:", res.data);
           if (res.data.status === "success") {
-            const newRes = await handleGetSets
-            console.log("Refreshed sets:", newRes.data);
-            setSets(newRes.data.sets || []);
+            await handleGetSets();
 
             setWeight(0);
             setReps(0);
+            setIsEditModalVisible(false);
+            setSetToEdit(null);
           }
         } catch(error){
             console.log("Create Set:", error)
@@ -204,3 +204,44 @@ const Dashboard = () => {
 
 export default Dashboard
 
+/*
+re-usable edit modal:
+
+modal takes:
+  a hashmap containing
+
+  title = {
+    objToEdit -- setToEdit
+
+    [variable1 updateVariable1 --- weight: updateWeight
+    variable2: updateVariable2 -- reps: updateReps] -- this should be an array of variables and their function
+
+    vairable1 = [var1, updateVar1]
+    vairable2 = [var2, updateVar2]
+
+    variables =  [variable1, variable2]
+
+    variables.map((var) => {
+        <Text> input
+      })
+
+    submit: submitFunction ------ handleUpdateSets
+  }
+
+
+
+*/
+
+
+/*
+june 22nd start date
+reporting to gustavo - berkley heights
+
+
+yearly salary - 90k
+
+
+reach out to gustavo after reaching out.
+
+48 hours response
+*/

@@ -6,6 +6,7 @@ import AuthContext from './context/AuthContext'
 import ExerciseContext from './context/ExerciseContext'
 import CreateDayModal from './components/CreateDayModal'
 import UpdateDayModal from './components/updateDayModal'
+import UpdateModal from './components/updateModal'
 
 const Dashboard = () => {
 
@@ -13,13 +14,13 @@ const Dashboard = () => {
   const [error, setError] = useState(null)
   const [newDayName, setNewDayName] = useState("")
   const [days, setDays] = useState([])
-  const [isEditModalVisible, setIsEditModalVisible] = useState(false)
+  const [isEditModalVisible, setIsEditModalVisible] = useState(true)
   const [dayToEdit, setDayToEdit] = useState(null)
 
   const router = useRouter()
 
   const { currentUser } = useContext(AuthContext)
-  const { getDays, createDay, currentDay, setCurrentDay, currentExercise } = useContext(ExerciseContext)
+  const { getDays, createDay, currentDay, setCurrentDay, currentExercise, updateDay } = useContext(ExerciseContext)
 
   useEffect(() => {
       if (!currentUser || currentUser === 0) return;  
@@ -32,7 +33,7 @@ const Dashboard = () => {
               setError(err ||"Couldn't load days");
           });
 
-    }, [currentUser]);
+    }, [currentUser, dayToEdit]);
 
     const handleCreateDay = async () =>{
         setError("")
@@ -60,22 +61,19 @@ const Dashboard = () => {
     }
 
     const handleUpdateDay = async () =>{
+      console.log("accessing updateDay")
       setError("")
-      if (!dayToEdit?.set_entry_id) {
-          setError("No set selected to update")
+      if (!dayToEdit?.day_id) {
+        console.log("if statement!")
+          setError("No day selected to update")
           return
       }
       try{
-          const res = await updateSet(dayToEdit.day_id, newDayName);
+        console.log("trying update day!")
+          const res = await updateDay(dayToEdit.day_id, newDayName);
           console.log("Update set response:", res.data);
-        if (res.data.status === "success") {
-          const newRes = await handleGetSets
-          console.log("Refreshed sets:", newRes.data);
-          setSets(newRes.data.sets || []);
-
-        }
       } catch(error){
-          console.log("Create Set:", error)
+          console.log("Update Day: ", error)
           setError(error.response?.data?.message || "An error occurred during Create Set");
       }
   }
@@ -91,19 +89,42 @@ const Dashboard = () => {
         //error={error}
       />
 
-
+{    /*
       <UpdateDayModal
         visible={isEditModalVisible}
-        onClose={() => setIsEditModalVisible(false)}
+        onClose={() => {
+          setIsEditModalVisible(false)
+          setNewDayName("")
+          setDayToEdit(null)
+        }}
         handleUpdateDay={handleUpdateDay}
-        dayName={newDayName}
+        newDayName={newDayName}
         setNewDayName={setNewDayName}
         error={error}
         dayToEdit={dayToEdit}
         setDayToEdit={setDayToEdit}
       />
-
-
+*/
+      <UpdateModal
+        visible={isEditModalVisible}
+        onClose={() => {
+          setIsEditModalVisible(false)
+          setNewDayName("")
+          setDayToEdit(null)
+        }}
+        title={"Update Day"}
+        errors={error}
+        updateFunction={handleUpdateDay}
+        setErrors={setError}
+        objToEdit={dayToEdit}
+        setObjToEdit={setDayToEdit}
+        variables = {[
+          ["Update Day Name:", "Enter Updated Name:", newDayName, setNewDayName]
+        ]}
+      
+      />
+        
+}
 
 
       <View style={styles.headerContainer}>

@@ -49,7 +49,7 @@ export function ExerciseProvider({children}) {
       params: { userID }
     });
   }
-  const updateDayName = (dayID, newDayName) =>{
+  const updateDay = (dayID, newDayName) =>{
     return axios.post(`${API_HOST}/exercises/updateDayName`, {
       dayID,
       newDayName
@@ -137,7 +137,7 @@ export function ExerciseProvider({children}) {
       setCurrentExercise,
       createDay,
       getDays,
-      updateDayName,
+      updateDay,
       createExercise,
       getExercises,
       updateExerciseName,
