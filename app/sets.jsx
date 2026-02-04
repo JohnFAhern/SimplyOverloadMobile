@@ -232,16 +232,3 @@ modal takes:
 
 */
 
-
-/*
-june 22nd start date
-reporting to gustavo - berkley heights
-
-
-yearly salary - 90k
-
-
-reach out to gustavo after reaching out.
-
-48 hours response
-*/
