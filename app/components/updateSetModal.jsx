@@ -2,10 +2,17 @@ import { View, Text, Pressable, TextInput, Modal } from 'react-native'
 import React from 'react'
 import { dashboardStyles as styles } from '../../styles/dashboardStyles'
 
-const UpdateSetModal = ({ visible, onClose, handleUpdateSet, weight, setWeight, reps, setReps, error, set}) => {
+const UpdateSetModal = ({ visible, onClose, handleUpdateSet, handleDeleteSet, weight, setWeight, reps, setReps, error, set}) => {
   
   const handleSubmit = async () => {
     await handleUpdateSet()
+    onClose()
+    setWeight(0)
+    setReps(0)
+  }
+
+  const handleDelete = async () => {
+    await handleDeleteSet()
     onClose()
     setWeight(0)
     setReps(0)
@@ -51,6 +58,14 @@ const UpdateSetModal = ({ visible, onClose, handleUpdateSet, weight, setWeight, 
           >
             <Text style={styles.defaultButtonText}>Update Set</Text>
           </Pressable>
+          {handleDeleteSet && (
+            <Pressable 
+              style={[styles.defaultButton, { backgroundColor: '#8B3A3A' }]}
+              onPress={handleDelete}
+            >
+              <Text style={styles.defaultButtonText}>Delete Set</Text>
+            </Pressable>
+          )}
         </View>
         <Pressable 
           style={styles.defaultButton}

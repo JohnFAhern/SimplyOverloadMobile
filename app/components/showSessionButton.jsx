@@ -26,8 +26,13 @@ const ShowSessionButton = ({ title, sessionArray, isVisible, setVisibility, setT
                 {sessionArray.map((set, index) => (
                   <Pressable 
                     style={styles.dayButtonContainer}
-                    key={set.set_entry_id || `set-${index}`}
-                    onLongPress={() => {console.log("long press")}}
+                    key={set.setEntryId || `set-${index}`}
+                    onLongPress={() => {
+                      setSetToEdit(set)
+                      setWeight(set.weight)
+                      setReps(set.reps)
+                      setIsEditModalVisible(true)
+                    }}
                   >
                     <Text 
                       style={styles.daysButtonText}
@@ -66,7 +71,7 @@ const ShowSessionButton = ({ title, sessionArray, isVisible, setVisibility, setT
                     {sets.map((set, index) => (
                       <Pressable 
                         style={styles.dayButtonContainer}
-                        key={set.set_entry_id || `${date}-set-${index}`}
+                        key={set.setEntryId || `${date}-set-${index}`}
                         onLongPress={() => {
                             console.log("Edit Set Modal")
                             setSetToEdit(set)

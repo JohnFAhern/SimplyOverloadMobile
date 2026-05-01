@@ -2,7 +2,7 @@ import { View, Text, Pressable, TextInput, Modal } from 'react-native'
 import React from 'react'
 import { dashboardStyles as styles } from '../../styles/dashboardStyles'
 
-const UpdateModal = ({ visible, onClose, error, title, setErrors, objToEdit, setObjToEdit, variables, updateFunction }) => {
+const UpdateModal = ({ visible, onClose, error, title, setErrors, objToEdit, setObjToEdit, variables, updateFunction, deleteFunction }) => {
   /*
         visible={isEditModalVisible}
         title={"Update Day"}
@@ -16,6 +16,11 @@ const UpdateModal = ({ visible, onClose, error, title, setErrors, objToEdit, set
   const handleSubmit = async () => {
     console.log("handling submit")
     await updateFunction()
+    onClose()
+  }
+
+  const handleDelete = async () => {
+    await deleteFunction()
     onClose()
   }
 
@@ -60,8 +65,16 @@ const UpdateModal = ({ visible, onClose, error, title, setErrors, objToEdit, set
             style={styles.defaultButton}
             onPress={handleSubmit}
           >
-            <Text style={styles.defaultButtonText}>Update Day</Text>
+            <Text style={styles.defaultButtonText}>{title}</Text>
           </Pressable>
+          {deleteFunction && (
+            <Pressable 
+              style={[styles.defaultButton, { backgroundColor: '#8B3A3A' }]}
+              onPress={handleDelete}
+            >
+              <Text style={styles.defaultButtonText}>Delete</Text>
+            </Pressable>
+          )}
         </View>
         <Pressable 
           style={styles.defaultButton}

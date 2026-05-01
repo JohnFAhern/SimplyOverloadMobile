@@ -31,24 +31,36 @@ const Dashboard = () => {
   const router = useRouter()
 
   const { currentUser } = useContext(AuthContext)
-  const { setCurrentExercise, currentExercise, getSets, createSets, updateSet } = useContext(ExerciseContext)
+  const { setCurrentExercise, currentExercise, getSets, createSets, updateSet, deleteSet } = useContext(ExerciseContext)
 
   const handleGetSets = async () => {
-    
       try{
-          const res = await getSets(currentExercise.exercise_id)
+          const res = await getSets(currentExercise.exerciseId)
           console.log("Backend response:", res.data);
-          console.log("todaysSession:", res.data.todaySession);
-          setTodaysSession(res.data.todaySession)
-          setLastSession(res.data.lastSession);
-          setPreviousSessions(res.data.previousSessions);
-          setAllTimeHigh(res.data.allTimeHigh)
-          setLastSessionHigh(res.data.lastSessionHigh)
-        
-      }catch(err) {
-          setError(err ||"Couldn't load Sets");
-      };
+          const allData = res.data || {}
+          const today = new Date().toISOString().split('T')[0]
+          const sortedDates = Object.keys(allData).sort((a, b) => b.localeCompare(a))
 
+          const todaySets = allData[today] || []
+          const pastDates = sortedDates.filter(d => d !== today)
+          const lastSessionSets = pastDates.length > 0 ? allData[pastDates[0]] : []
+          const prevDates = pastDates.slice(1)
+          const prevSessions = prevDates.length > 0
+            ? Object.fromEntries(prevDates.map(d => [d, allData[d]]))
+            : {}
+
+          const allSets = Object.values(allData).flat()
+          const allTimeHigh = allSets.reduce((max, s) => !max || s.weight > max.weight ? s : max, null)
+          const lastSessionHigh = lastSessionSets.reduce((max, s) => !max || s.weight > max.weight ? s : max, null)
+
+          setTodaysSession(todaySets)
+          setLastSession(lastSessionSets)
+          setPreviousSessions(prevSessions)
+          setAllTimeHigh(allTimeHigh)
+          setLastSessionHigh(lastSessionHigh)
+      }catch(err) {
+          setError(err || "Couldn't load Sets");
+      };
   }
 
   useEffect(() => {
@@ -64,14 +76,9 @@ const Dashboard = () => {
         try{
             const res = await createSets(weight, reps);
             console.log("Create set response:", res.data);
-          if (res.data.status === "success") {
-            await getSets(currentExercise.exercise_id);
-            //console.log("Refreshed sets:", newRes.data);
-            setSets(newRes.data.sets || []);
-
+            await handleGetSets();
             setWeight(0);
             setReps(0);
-          }
         } catch(error){
             console.log("Create Set:", error)
             setError(error.response?.data?.message || "An error occurred during Create Set");
@@ -80,25 +87,39 @@ const Dashboard = () => {
     const handleUpdateSet = async () =>{
         setError("")
         console.log("setToEdit:", setToEdit)
-        console.log("setToEdit.set_entry_id:", setToEdit?.set_entry_id)
-        if (!setToEdit?.set_entry_id) {
+        console.log("setToEdit.setEntryId:", setToEdit?.setEntryId)
+        if (!setToEdit?.setEntryId) {
             setError("No set selected to update")
             return
         }
         try{
-            const res = await updateSet(setToEdit.set_entry_id, weight, reps);
+            const res = await updateSet(setToEdit.setEntryId, weight, reps);
             console.log("Update set response:", res.data);
-          if (res.data.status === "success") {
             await handleGetSets();
-
             setWeight(0);
             setReps(0);
             setIsEditModalVisible(false);
             setSetToEdit(null);
-          }
         } catch(error){
             console.log("Create Set:", error)
             setError(error.response?.data?.message || "An error occurred during Create Set");
+        }
+    }
+
+    const handleDeleteSet = async () =>{
+        setError("")
+        if (!setToEdit?.setEntryId) {
+            setError("No set selected to delete")
+            return
+        }
+        try{
+            await deleteSet(setToEdit.setEntryId);
+            await handleGetSets();
+            setIsEditModalVisible(false);
+            setSetToEdit(null);
+        } catch(error){
+            console.log("Delete Set:", error)
+            setError(error.response?.data?.message || "An error occurred during Delete Set");
         }
     }
 
@@ -123,6 +144,7 @@ const Dashboard = () => {
         visible={isEditModalVisible}
         onClose={() => setIsEditModalVisible(false)}
         handleUpdateSet={handleUpdateSet}
+        handleDeleteSet={handleDeleteSet}
         weight={weight}
         setWeight={setWeight}
         reps ={reps}
@@ -133,7 +155,7 @@ const Dashboard = () => {
       />
       <View style={styles.headerContainer}>
           <Text style={[styles.headerItem, { flexWrap: 'wrap' }]} numberOfLines={0}>
-            {currentExercise?.exercise_name || "Loading..."}
+            {currentExercise?.exerciseName || "Loading..."}
           </Text>
           
       </View>

@@ -21,11 +21,10 @@ const Login = () => {
         try{
             const res = await login(email, password);
             console.log("Response from server:", res.data);
-            if (res.data.status === "success"){
-                let userID = parseInt(res.data.user_id)
-                console.log("Setting user ID to:", userID);
-                setUser(userID)
-                console.log("Navigating to dashboard...");
+            const userID = res.data.userId
+            const token = res.data.token
+            if (userID && token) {
+                await setUser(userID, token)
                 router.push("/dashboard");
             } else {
                 setError("Invalid email or password");

@@ -14,20 +14,20 @@ const Dashboard = () => {
   const [error, setError] = useState(null)
   const [newDayName, setNewDayName] = useState("")
   const [days, setDays] = useState([])
-  const [isEditModalVisible, setIsEditModalVisible] = useState(true)
+  const [isEditModalVisible, setIsEditModalVisible] = useState(false)
   const [dayToEdit, setDayToEdit] = useState(null)
 
   const router = useRouter()
 
-  const { currentUser } = useContext(AuthContext)
-  const { getDays, createDay, currentDay, setCurrentDay, currentExercise, updateDay } = useContext(ExerciseContext)
+  const { currentUser, logout } = useContext(AuthContext)
+  const { getDays, createDay, currentDay, setCurrentDay, currentExercise, updateDay, deleteDay } = useContext(ExerciseContext)
 
   useEffect(() => {
-      if (!currentUser || currentUser === 0) return;  
+      if (!currentUser) return;  
 
       getDays(currentUser)
           .then(res => {
-              setDays(res.data.days);
+              setDays(res.data);
           })
           .catch(err => {
               setError(err ||"Couldn't load days");
@@ -37,18 +37,16 @@ const Dashboard = () => {
 
     const handleCreateDay = async () =>{
         setError("")
-        if (days.some((d) => d.day_name === newDayName)) {
+        if (days.some((d) => d.dayName === newDayName)) {
             setError(`${newDayName} already exists!`);
             return;
         }
         try{
             const res = await createDay(currentUser, newDayName);
             console.log("Response from server:", res.data);
-            if (res.data.status === "success"){
-                await getDays(currentUser).then((res) => {
-                    setDays(res.data.days);
-                });
-            }
+            await getDays(currentUser).then((res) => {
+                setDays(res.data);
+            });
         }catch(error){
             console.log("Create Day:", error)
             setError(error.response?.data?.message || "An error occurred during Create Day");
@@ -63,18 +61,38 @@ const Dashboard = () => {
     const handleUpdateDay = async () =>{
       console.log("accessing updateDay")
       setError("")
-      if (!dayToEdit?.day_id) {
+      if (!dayToEdit?.dayId) {
         console.log("if statement!")
           setError("No day selected to update")
           return
       }
       try{
         console.log("trying update day!")
-          const res = await updateDay(dayToEdit.day_id, newDayName);
+          const res = await updateDay(dayToEdit.dayId, newDayName, currentUser);
           console.log("Update set response:", res.data);
+          await getDays(currentUser).then((res) => {
+            setDays(res.data);
+          });
       } catch(error){
           console.log("Update Day: ", error)
           setError(error.response?.data?.message || "An error occurred during Create Set");
+      }
+  }
+
+  const handleDeleteDay = async () =>{
+      setError("")
+      if (!dayToEdit?.dayId) {
+          setError("No day selected to delete")
+          return
+      }
+      try{
+          await deleteDay(dayToEdit.dayId);
+          await getDays(currentUser).then((res) => {
+            setDays(res.data);
+          });
+      } catch(error){
+          console.log("Delete Day: ", error)
+          setError(error.response?.data?.message || "An error occurred during Delete Day");
       }
   }
 
@@ -115,6 +133,7 @@ const Dashboard = () => {
         title={"Update Day"}
         errors={error}
         updateFunction={handleUpdateDay}
+        deleteFunction={handleDeleteDay}
         setErrors={setError}
         objToEdit={dayToEdit}
         setObjToEdit={setDayToEdit}
@@ -129,6 +148,9 @@ const Dashboard = () => {
 
       <View style={styles.headerContainer}>
           <Text style={styles.headerItem}>Days</Text>
+          <Pressable onPress={logout}>
+            <Text style={{ color: '#8B3A3A', textAlign: 'center', fontSize: 16 }}>Logout</Text>
+          </Pressable>
       </View>
       {days == null ? (
         <Text>Loading</Text>
@@ -142,12 +164,12 @@ const Dashboard = () => {
           {days.map((day) => (
             <Pressable 
               style={styles.dayButtonContainer}
-              key={day.day_id}
+              key={day.dayId}
               onPress={() => handleDaySelect(day)}
               onLongPress={() => {
                 console.log("long")
                 setDayToEdit(day)
-                setNewDayName(day.day_name)
+                setNewDayName(day.dayName)
                 setIsEditModalVisible(true)
               }}
               
@@ -158,7 +180,7 @@ const Dashboard = () => {
                 numberOfLines={1}
                 ellipsizeMode="tail"
               >
-                {day.day_name}
+                {day.dayName}
               </Text>
             </Pressable>
           ))}

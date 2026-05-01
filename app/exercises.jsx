@@ -6,6 +6,7 @@ import { Link, useRouter } from "expo-router"
 import AuthContext from './context/AuthContext'
 import ExerciseContext from './context/ExerciseContext'
 import CreateExerciseModal from './components/CreateExerciseModal'
+import UpdateModal from './components/updateModal'
 
 const Dashboard = () => {
 
@@ -13,17 +14,19 @@ const Dashboard = () => {
   const [error, setError] = useState("")
   const [newExerciseName, setNewExerciseName] = useState("")
   const [exercises, setExercises] = useState([])
+  const [isEditModalVisible, setIsEditModalVisible] = useState(false)
+  const [exerciseToEdit, setExerciseToEdit] = useState(null)
 
   const router = useRouter()
 
   const { currentUser } = useContext(AuthContext)
-  const { currentDay, setCurrentDay, getExercises, createExercise, setCurrentExercise } = useContext(ExerciseContext)
+  const { currentDay, setCurrentDay, getExercises, createExercise, setCurrentExercise, updateExerciseName, deleteExercise } = useContext(ExerciseContext)
   useEffect(() => {
       if (!currentUser) return;  
 
-      getExercises(currentDay.day_id)
+      getExercises(currentDay.dayId)
           .then(res => {
-              setExercises(res.data.exercises);
+              setExercises(res.data);
           })
           .catch(err => {
               setError(err ||"Couldn't load Exercises");
@@ -33,18 +36,16 @@ const Dashboard = () => {
 
     const handleCreateExercise = async () =>{
         setError("")
-        if (exercises.some((e) => e.exercise_name === newExerciseName)) {
+        if (exercises.some((e) => e.exerciseName === newExerciseName)) {
             setError(`${newExerciseName} already exists!`);
             return;
         }
         try{
             const res = await createExercise(newExerciseName);
             console.log("Response from server:", res.data);
-            if (res.data.status === "success"){
-                await getExercises(currentDay.day_id).then((res) => {
-                    setExercises(res.data.exercises);
+            await getExercises(currentDay.dayId).then((res) => {
+                    setExercises(res.data);
                 });
-            }
         }catch(error){
             console.log("Create Exercise:", error)
             setError(error.response?.data?.message || "An error occurred during Create Exercise");
@@ -54,6 +55,41 @@ const Dashboard = () => {
       setCurrentExercise(exercise)
       await AsyncStorage.setItem("currentExercise", JSON.stringify(exercise))
       router.push("/sets")
+    }
+
+    const handleUpdateExercise = async () =>{
+      setError("")
+      if (!exerciseToEdit?.exerciseId) {
+          setError("No exercise selected to update")
+          return
+      }
+      try{
+          const res = await updateExerciseName(exerciseToEdit.exerciseId, newExerciseName);
+          console.log("Update exercise response:", res.data);
+          await getExercises(currentDay.dayId).then((res) => {
+            setExercises(res.data);
+          });
+      } catch(error){
+          console.log("Update Exercise: ", error)
+          setError(error.response?.data?.message || "An error occurred during Update Exercise");
+      }
+    }
+
+    const handleDeleteExercise = async () =>{
+      setError("")
+      if (!exerciseToEdit?.exerciseId) {
+          setError("No exercise selected to delete")
+          return
+      }
+      try{
+          await deleteExercise(exerciseToEdit.exerciseId);
+          await getExercises(currentDay.dayId).then((res) => {
+            setExercises(res.data);
+          });
+      } catch(error){
+          console.log("Delete Exercise: ", error)
+          setError(error.response?.data?.message || "An error occurred during Delete Exercise");
+      }
     }
 
   return (
@@ -66,8 +102,26 @@ const Dashboard = () => {
         setExerciseName={setNewExerciseName}
         error={error}
       />
+      <UpdateModal
+        visible={isEditModalVisible}
+        onClose={() => {
+          setIsEditModalVisible(false)
+          setNewExerciseName("")
+          setExerciseToEdit(null)
+        }}
+        title={"Update Exercise"}
+        errors={error}
+        updateFunction={handleUpdateExercise}
+        deleteFunction={handleDeleteExercise}
+        setErrors={setError}
+        objToEdit={exerciseToEdit}
+        setObjToEdit={setExerciseToEdit}
+        variables={[
+          ["Update Exercise Name:", "Enter Updated Name:", newExerciseName, setNewExerciseName]
+        ]}
+      />
       <View style={styles.headerContainer}>
-          <Text style={styles.headerItem}>{currentDay.day_name}</Text>
+          <Text style={styles.headerItem}>{currentDay.dayName}</Text>
       </View>
       {exercises == null ? (
         <Text>Loading</Text>
@@ -81,13 +135,18 @@ const Dashboard = () => {
           {exercises.map((exercise) => (
             <Pressable 
               style={styles.dayButtonContainer}
-              key={exercise.exercise_id}
+              key={exercise.exerciseId}
               onPress={() => handleExerciseSelect(exercise)}
+              onLongPress={() => {
+                setExerciseToEdit(exercise)
+                setNewExerciseName(exercise.exerciseName)
+                setIsEditModalVisible(true)
+              }}
             >
               <Text 
                 style={styles.daysButtonText}
               >
-                {exercise.exercise_name}
+                {exercise.exerciseName}
               </Text>
             </Pressable>
           ))}

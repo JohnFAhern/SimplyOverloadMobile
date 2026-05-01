@@ -1,26 +1,11 @@
-import { Text, View } from "react-native";
-import { Link } from "expo-router"
-// colors:
-// #181C14
-// #3C3D37
-// #697565
-// #ECDFCC
+import { View, ActivityIndicator } from "react-native";
+
 export default function Index() {
+  // Navigation is handled by AuthGuard in _layout.jsx.
+  // Render a blank loading screen while the redirect fires.
   return (
-    <View
-      style={{
-        flex: 1,
-        justifyContent: "center",
-        alignItems: "center",
-      }}
-    >
-      <Text>Edit app/index.tsx to edit this screen.</Text>
-      <Link href='/login'>
-        <Text>Go to Login</Text>
-      </Link>
-      <Link href='/dashboard'>
-        <Text>Go to Dashboard</Text>
-      </Link>
+    <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+      <ActivityIndicator size="large" />
     </View>
   );
 }
