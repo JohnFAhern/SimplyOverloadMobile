@@ -20,6 +20,7 @@ export function AuthProvider({children}) {
 
 
   const setUserFromResponse = async (response) => {
+    console.log("Accessing SetUserFrom Response in Context/AuthContext")
 
     const userData = {
       token: response.data.token,
@@ -27,24 +28,34 @@ export function AuthProvider({children}) {
       email: response.data.email
     }
 
+
     await AsyncStorage.setItem('user', JSON.stringify(userData));
     setUser(userData)
+
+    console.log(`UserId: ${user.userId}`)
+    console.log(`email: ${user.email}`)
+    console.log(`Token: ${user.token}`)
     return userData
   }
 
   const login = async (email, password) => {
+    console.log("accessing login")
     
     const response = await axios.post(`${API_HOST}/login`, {email, password})
+    console.log(response.data)
     return setUserFromResponse(response)
   }
 
   const register = async (email, password) => {
+    console.log("Accessing Register in Context/AuthContext")
     
     const response = await axios.post(`${API_HOST}/register`, {email, password})
+    console.log(response.data)
     return setUserFromResponse(response)
   }
 
   const logout = async () =>{
+    console.log("Accessing log out")
     setUser(null)
     await AsyncStorage.removeItem("userData")
   }

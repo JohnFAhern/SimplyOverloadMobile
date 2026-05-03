@@ -15,6 +15,7 @@ export function DayProvider({children}) {
   const [dayList, setDayList] = useState([])
 
   const selectDay = async (object) => {
+    console.log("Accessing selectDay in context/DayContext")
     const dayData = {
       dayId: object.dayId,
       dayName: object.dayName
@@ -22,6 +23,7 @@ export function DayProvider({children}) {
 
     await AsyncStorage.setItem('currentDay', JSON.stringify(dayData));
     setCurrentDay(dayData)
+    console.log()
     return dayData
 
   }
