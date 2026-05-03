@@ -1,6 +1,6 @@
 import { Stack, useRouter, useSegments } from "expo-router";
 import { AuthProvider } from "./context/AuthContext";
-import { ExerciseProvider } from "./context/ExerciseContext"
+import { ExerciseProvider } from "./context/DayContext"
 import AuthContext from "./context/AuthContext"
 import { useContext, useEffect } from 'react'
 

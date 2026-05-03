@@ -6,40 +6,54 @@ import { Platform } from 'react-native'
 const AuthContext = createContext(null)
 
 export function AuthProvider({children}) {
-  const [currentUser, setCurrentUser] = useState(0) // UserId from user table
+  const [user, setUser] = useState(null)
+
+  const API_HOST = "http://localhost:8080/api/v1/auth"
 
   useEffect(() => {
     const loadUserData = async () => {
-      const userID = await AsyncStorage.getItem("userID")
-      if(userID) setCurrentUser(parseInt(userID))
+      const user = await AsyncStorage.getItem("userID")
+      if(user) setUser(parseInt(user))
     }
     loadUserData()
   }, [])
 
-  const setUser = async (userID) => {
-    setCurrentUser(userID)
-    await AsyncStorage.setItem("userID", userID.toString())
+
+  const setUserFromResponse = async (response) => {
+
+    const userData = {
+      token: response.data.token,
+      userId: response.data.userId,
+      email: response.data.email
+    }
+
+    await AsyncStorage.setItem('user', JSON.stringify(userData));
+    setUser(userData)
+    return userData
   }
 
-  const API_HOST = Platform.OS === 'android' ? 'http://10.0.2.2:3000' : 'http://localhost:3000'
+  const login = async (email, password) => {
+    
+    const response = await axios.post(`${API_HOST}/login`, {email, password})
+    return setUserFromResponse(response)
+  }
 
-  const login =(email, password) => {
-    return axios.post(`${API_HOST}/users/login`, { email, password }, { headers: { 'Content-Type': 'application/json' } })
+  const register = async (email, password) => {
+    
+    const response = await axios.post(`${API_HOST}/register`, {email, password})
+    return setUserFromResponse(response)
   }
 
   const logout = async () =>{
-    setCurrentUser(0)
-    await AsyncStorage.removeItem("userID")
+    setUser(null)
+    await AsyncStorage.removeItem("userData")
   }
 
- const register = (email, password) => {
-    return axios.post(`${API_HOST}/users/register`, { email, password }, { headers: { 'Content-Type': 'application/json' } })
-  }
+
 
   return (
     <AuthContext.Provider value={{
-      currentUser,
-      setUser,
+      user,
       login,
       logout,
       register,

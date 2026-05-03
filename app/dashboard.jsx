@@ -3,7 +3,7 @@ import React, { useState, useContext, useEffect } from 'react'
 import { dashboardStyles as styles } from '../styles/dashboardStyles'
 import { Link, useRouter } from "expo-router"
 import AuthContext from './context/AuthContext'
-import ExerciseContext from './context/ExerciseContext'
+import ExerciseContext from './context/DayContext'
 import CreateDayModal from './components/CreateDayModal'
 import UpdateDayModal from './components/updateDayModal'
 import UpdateModal from './components/updateModal'
