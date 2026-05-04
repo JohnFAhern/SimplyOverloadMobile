@@ -1,9 +1,9 @@
 import { View, Text, Pressable, TextInput } from 'react-native'
 import { Link } from "expo-router"
 import { authStyles as styles } from '../styles/authStyles'
-import AuthContext from './context/AuthContext'
-import React, { createContext, useState, useEffect, useContext } from 'react'
+import React, { useState, useEffect, useContext } from 'react'
 import { useRouter } from "expo-router"
+import AuthContext from './context/AuthContext'
 
 
 
@@ -13,23 +13,15 @@ const Login = () => {
     const [error, setError] = useState("")
 
     const router = useRouter()
-    const { login, setUser } = useContext(AuthContext)
+    const { login } = useContext(AuthContext)
 
 
-    const handleSubmit = async () =>{
+    const handleSubmit = async () => {
         setError("")
-        try{
-            const res = await login(email, password);
-            console.log("Response from server:", res.data);
-            const userID = res.data.userId
-            const token = res.data.token
-            if (userID && token) {
-                await setUser(userID, token)
-                router.push("/dashboard");
-            } else {
-                setError("Invalid email or password");
-            }
-        }catch(error){
+        try {
+            await login(email, password);
+            router.replace('/dashboard');
+        } catch(error) {
             console.log("Login:", error)
             setError("An error occurred during login");
         }

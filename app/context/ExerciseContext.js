@@ -15,6 +15,14 @@ export function ExerciseProvider({children}) {
   const [currentExercise, setCurrentExercise] = useState(null)
   const [exerciseList, setExerciseList] = useState([])
 
+  useEffect(() => {
+    const loadCurrentExerciseData = async () => {
+      const exerciseString = await AsyncStorage.getItem("currentExercise")
+      if(exerciseString) setCurrentDay(JSON.parse(exerciseString))
+    }
+    loadCurrentExerciseData()
+  }, [])
+
   const selectExercise = async (object) => {
     const exerciseData = {
       exerciseId: object.exerciseId,
@@ -26,7 +34,7 @@ export function ExerciseProvider({children}) {
     return exerciseData
 
   }
-  
+
   const createExercise = async (exerciseName) => {
     const response = await api.post(`/exercises`, {dayId: currentDay.dayId, exerciseName})
     return selectExercise(response.data)

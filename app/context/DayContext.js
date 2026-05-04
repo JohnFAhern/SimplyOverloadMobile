@@ -14,6 +14,14 @@ export function DayProvider({children}) {
   const [currentDay, setCurrentDay] = useState(null)
   const [dayList, setDayList] = useState([])
 
+  useEffect(() => {
+    const loadCurrentDayData = async () => {
+      const dayString = await AsyncStorage.getItem("currentDay")
+      if(dayString) setCurrentDay(JSON.parse(dayString))
+    }
+    loadCurrentDayData()
+  }, [])
+
   const selectDay = async (object) => {
     console.log("Accessing selectDay in context/DayContext")
     const dayData = {

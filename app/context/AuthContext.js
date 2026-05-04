@@ -12,8 +12,8 @@ export function AuthProvider({children}) {
 
   useEffect(() => {
     const loadUserData = async () => {
-      const user = await AsyncStorage.getItem("userID")
-      if(user) setUser(parseInt(user))
+      const userString = await AsyncStorage.getItem("user")
+      if(userString) setUser(JSON.parse(userString))
     }
     loadUserData()
   }, [])
