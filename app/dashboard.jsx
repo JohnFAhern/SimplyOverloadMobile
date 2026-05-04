@@ -3,55 +3,45 @@ import React, { useState, useContext, useEffect } from 'react'
 import { dashboardStyles as styles } from '../styles/dashboardStyles'
 import { Link, useRouter } from "expo-router"
 import AuthContext from './context/AuthContext'
-import ExerciseContext from './context/DayContext'
 import CreateDayModal from './components/CreateDayModal'
 import UpdateDayModal from './components/updateDayModal'
 import UpdateModal from './components/updateModal'
+import DayContext from './context/DayContext'
 
 const Dashboard = () => {
 
   const [isModalVisible, setIsModalVisible] = useState(false)
   const [error, setError] = useState(null)
   const [newDayName, setNewDayName] = useState("")
-  const [days, setDays] = useState([])
   const [isEditModalVisible, setIsEditModalVisible] = useState(false)
   const [dayToEdit, setDayToEdit] = useState(null)
 
   const router = useRouter()
 
   const { currentUser, logout } = useContext(AuthContext)
-  const { getDays, createDay, currentDay, setCurrentDay, currentExercise, updateDay, deleteDay } = useContext(ExerciseContext)
+  const { getDays, createDay, currentDay, setCurrentDay, currentExercise, updateDay, deleteDay, dayList } = useContext(DayContext)
 
-  useEffect(() => {
-      if (!currentUser) return;  
-
-      getDays(currentUser)
-          .then(res => {
-              setDays(res.data);
-          })
-          .catch(err => {
-              setError(err ||"Couldn't load days");
-          });
-
-    }, [currentUser, dayToEdit]);
+    useEffect(() => {
+        getDays()
+    }, []);
 
     const handleCreateDay = async () =>{
         setError("")
-        if (days.some((d) => d.dayName === newDayName)) {
+        if (dayList.some((d) => d.dayName === newDayName)) {
             setError(`${newDayName} already exists!`);
             return;
         }
         try{
-            const res = await createDay(currentUser, newDayName);
-            console.log("Response from server:", res.data);
-            await getDays(currentUser).then((res) => {
-                setDays(res.data);
-            });
+            await createDay(newDayName);
+            console.log("handling create day")
+            await getDays()
+
         }catch(error){
             console.log("Create Day:", error)
             setError(error.response?.data?.message || "An error occurred during Create Day");
         }
     }
+
 
     const handleDaySelect = (dayID) => {
       setCurrentDay(dayID)
@@ -152,16 +142,16 @@ const Dashboard = () => {
             <Text style={{ color: '#8B3A3A', textAlign: 'center', fontSize: 16 }}>Logout</Text>
           </Pressable>
       </View>
-      {days == null ? (
+      {dayList == null ? (
         <Text>Loading</Text>
-      ) : days.length === 0 ? (
+      ) : dayList.length === 0 ? (
         <Text> You Dont Have Any Days!</Text>
       ) : (
         <ScrollView 
           style={styles.boxContainer}
           contentContainerStyle={{ gap: 15, paddingVertical: 15 }}
         >
-          {days.map((day) => (
+          {dayList.map((day) => (
             <Pressable 
               style={styles.dayButtonContainer}
               key={day.dayId}

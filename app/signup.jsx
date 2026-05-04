@@ -16,7 +16,7 @@ const SignUp = () => {
     const [error, setError] = useState("")
 
     const router = useRouter()
-    const { register, setUser } = useContext(AuthContext)
+    const { register } = useContext(AuthContext)
 
     const handleSubmit = async () =>{
         setError("")
@@ -27,16 +27,7 @@ const SignUp = () => {
         }
 
         try{
-            const res = await register(email, password);
-            console.log("Response from server:", res.data);
-            const userID = res.data.userId
-            const token = res.data.token
-            if (userID && token) {
-                await setUser(userID, token)
-                router.push("/dashboard");
-            } else {
-                setError("Registration failed");
-            }
+            await register(email, password);
         }catch(error){
             console.log("Login:", error)
             setError("An error occurred during login");

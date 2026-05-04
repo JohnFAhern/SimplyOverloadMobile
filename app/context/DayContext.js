@@ -1,7 +1,7 @@
 import React, { createContext, useState, useEffect, useContext } from 'react'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import axios from 'axios'
-import api from "/api"
+import api from "./api"
 import { Platform } from 'react-native'
 import AuthContext from './AuthContext'
 
@@ -33,15 +33,19 @@ export function DayProvider({children}) {
     setCurrentDay(dayData)
     console.log()
     return dayData
-
   }
+
   const createDay = async (dayName) => {
+    console.log("create day pressed in context")
     const response = await api.post(`/days`, {userId: user.userId, dayName})
+    console.log("backend response: " + JSON.stringify(response.data))
     return selectDay(response.data)
   }
 
   const getDays = async () => {
+    console.log("getting days from days context")
     const response = await api.get(`/days/user/${user.userId}`)
+    console.log("backend response: " + JSON.stringify(response.data))
     return setDayList(response.data)
   }
 

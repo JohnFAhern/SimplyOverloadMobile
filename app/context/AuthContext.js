@@ -32,9 +32,9 @@ export function AuthProvider({children}) {
     await AsyncStorage.setItem('user', JSON.stringify(userData));
     setUser(userData)
 
-    console.log(`UserId: ${user.userId}`)
-    console.log(`email: ${user.email}`)
-    console.log(`Token: ${user.token}`)
+    console.log(`UserId: ${userData.userId}`)
+    console.log(`email: ${userData.email}`)
+    console.log(`Token: ${userData.token}`)
     return userData
   }
 
@@ -57,7 +57,7 @@ export function AuthProvider({children}) {
   const logout = async () =>{
     console.log("Accessing log out")
     setUser(null)
-    await AsyncStorage.removeItem("userData")
+    await AsyncStorage.removeItem("user")
   }
 
 

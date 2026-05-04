@@ -19,6 +19,7 @@ const Login = () => {
     const handleSubmit = async () => {
         setError("")
         try {
+            console.log("handle submitpressed")
             await login(email, password);
             router.replace('/dashboard');
         } catch(error) {

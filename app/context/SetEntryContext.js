@@ -1,7 +1,7 @@
 import React, { createContext, useState, useEffect, useContext } from 'react'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import axios from 'axios'
-import api from "/api"
+import api from "./api"
 import { Platform } from 'react-native'
 import ExerciseContext from './ExerciseContext'
 

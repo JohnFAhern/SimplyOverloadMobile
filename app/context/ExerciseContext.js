@@ -1,9 +1,9 @@
 import React, { createContext, useState, useEffect, useContext } from 'react'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import axios from 'axios'
-import api from "/api"
+import api from "./api"
 import { Platform } from 'react-native'
-
+import DayContext from './DayContext'
 
 const ExerciseContext = createContext(null)
 
@@ -15,13 +15,13 @@ export function ExerciseProvider({children}) {
   const [currentExercise, setCurrentExercise] = useState(null)
   const [exerciseList, setExerciseList] = useState([])
 
-  useEffect(() => {
+useEffect(() => {
     const loadCurrentExerciseData = async () => {
-      const exerciseString = await AsyncStorage.getItem("currentExercise")
-      if(exerciseString) setCurrentDay(JSON.parse(exerciseString))
+        const exerciseString = await AsyncStorage.getItem("currentExercise")
+        if(exerciseString) setCurrentExercise(JSON.parse(exerciseString))  // fix here
     }
     loadCurrentExerciseData()
-  }, [])
+}, [])
 
   const selectExercise = async (object) => {
     const exerciseData = {
