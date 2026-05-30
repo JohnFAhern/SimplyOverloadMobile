@@ -1,9 +1,10 @@
 import { View, Text, Pressable, TextInput, ScrollView, Modal } from 'react-native'
+import { SafeAreaView } from 'react-native-safe-area-context'
 import React, { useState, useContext, useEffect } from 'react'
 import { setStyles as styles } from '../styles/setStyles'
 import { Link, useRouter } from "expo-router"
-import AuthContext from './context/AuthContext'
 import ExerciseContext from './context/ExerciseContext'
+import SetEntryContext from './context/SetEntryContext'
 import CreateSetModal from './components/CreateSetModal'
 import UpdateSetModal from './components/updateSetModal'
 import ShowSessionButton from './components/showSessionButton'
@@ -30,14 +31,13 @@ const Dashboard = () => {
 
   const router = useRouter()
 
-  const { currentUser } = useContext(AuthContext)
-  const { setCurrentExercise, currentExercise, getSets, createSets, updateSet, deleteSet } = useContext(ExerciseContext)
+  const { currentExercise } = useContext(ExerciseContext)
+  const { getSetEntries, createSetEntry, editSetEntry, deleteSetEntry } = useContext(SetEntryContext)
 
   const handleGetSets = async () => {
       try{
-          const res = await getSets(currentExercise.exerciseId)
-          console.log("Backend response:", res.data);
-          const allData = res.data || {}
+          const allData = await getSetEntries() || {}
+          console.log("Backend response:", allData);
           const today = new Date().toISOString().split('T')[0]
           const sortedDates = Object.keys(allData).sort((a, b) => b.localeCompare(a))
 
@@ -64,18 +64,16 @@ const Dashboard = () => {
   }
 
   useEffect(() => {
-      if (!currentUser || !currentExercise) return;  
+      if (!currentExercise) return;
 
       handleGetSets()
-
 
     }, [currentExercise, setToEdit]);
 
     const handleCreateSet = async () =>{
         setError("")
         try{
-            const res = await createSets(weight, reps);
-            console.log("Create set response:", res.data);
+            await createSetEntry(reps, weight);
             await handleGetSets();
             setWeight(0);
             setReps(0);
@@ -93,8 +91,7 @@ const Dashboard = () => {
             return
         }
         try{
-            const res = await updateSet(setToEdit.setEntryId, weight, reps);
-            console.log("Update set response:", res.data);
+            await editSetEntry(setToEdit.setEntryId, reps, weight);
             await handleGetSets();
             setWeight(0);
             setReps(0);
@@ -113,7 +110,7 @@ const Dashboard = () => {
             return
         }
         try{
-            await deleteSet(setToEdit.setEntryId);
+            await deleteSetEntry(setToEdit.setEntryId);
             await handleGetSets();
             setIsEditModalVisible(false);
             setSetToEdit(null);
@@ -126,7 +123,7 @@ const Dashboard = () => {
     
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <CreateSetModal
         visible={isModalVisible}
         onClose={() => setIsModalVisible(false)}
@@ -153,60 +150,68 @@ const Dashboard = () => {
         setToEdit={setToEdit}
         setSetToEdit={setSetToEdit}
       />
-      <View style={styles.headerContainer}>
-          <Text style={[styles.headerItem, { flexWrap: 'wrap' }]} numberOfLines={0}>
+      <View style={[styles.headerContainer, { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16 }]}>
+          <Pressable onPress={() => router.back()} hitSlop={10} style={{ flex: 1 }}>
+            <Text style={{ fontSize: 28, color: '#3E3F29' }}>‹</Text>
+          </Pressable>
+          <Text style={[styles.headerItem, { flex: 2, textAlign: 'center', flexWrap: 'wrap' }]} numberOfLines={0}>
             {currentExercise?.exerciseName || "Loading..."}
           </Text>
-          
+          <View style={{ flex: 1 }} />
       </View>
 
       
-      <ScrollView 
-        style={{ flex: 1, width: '100%' }}
-        contentContainerStyle={{ gap: 10, paddingVertical: 10 }}
-      >
-        <ShowPersonalBestButton
-          title="Personal Best"
-          allTimeHigh = {allTimeHigh}
-          lastSessionHigh = {lastSessionHigh}
-          isVisible={isPersonalBestVisible}
-          setVisibility={setIsPersonalBestVisible}
-        />
-        <ShowSessionButton
-          title="Todays Session"
-          sessionArray={todaysSession}
-          isVisible={isTodaysSessionVisible}
-          setVisibility={setIsTodaysSessionVisible}
-          setToEdit={setToEdit}
-          setSetToEdit={setSetToEdit}
-          setIsEditModalVisible={setIsEditModalVisible}
-          setWeight={setWeight}
-          setReps={setReps}
-        />
-        <ShowSessionButton
-          title="Last Session"
-          sessionArray={lastSession}
-          isVisible={isLastSessionVisible}
-          setVisibility={setIsLastSessionVisible}
-          setToEdit={setToEdit}
-          setSetToEdit={setSetToEdit}
-          setIsEditModalVisible={setIsEditModalVisible}
-          setWeight={setWeight}
-          setReps={setReps}
-        />
-
-        <ShowSessionButton
-          title="Previous Sessions"
-          sessionArray={previousSessions}
-          isVisible={isPreviousSessionsVisible}
-          setVisibility={setIsPreviousSessionsVisible}
-          setToEdit={setToEdit}
-          setSetToEdit={setSetToEdit}
-          setIsEditModalVisible={setIsEditModalVisible}
-          setWeight={setWeight}
-          setReps={setReps}
-        />
-      </ScrollView>
+      {allTimeHigh ? (
+        <ScrollView 
+          style={{ flex: 1, width: '100%' }}
+          contentContainerStyle={{ gap: 10, paddingVertical: 10 }}
+        >
+          <ShowPersonalBestButton
+            title="Personal Best"
+            allTimeHigh={allTimeHigh}
+            lastSessionHigh={lastSessionHigh}
+            isVisible={isPersonalBestVisible}
+            setVisibility={setIsPersonalBestVisible}
+          />
+          <ShowSessionButton
+            title="Todays Session"
+            sessionArray={todaysSession}
+            isVisible={isTodaysSessionVisible}
+            setVisibility={setIsTodaysSessionVisible}
+            setToEdit={setToEdit}
+            setSetToEdit={setSetToEdit}
+            setIsEditModalVisible={setIsEditModalVisible}
+            setWeight={setWeight}
+            setReps={setReps}
+          />
+          <ShowSessionButton
+            title="Last Session"
+            sessionArray={lastSession}
+            isVisible={isLastSessionVisible}
+            setVisibility={setIsLastSessionVisible}
+            setToEdit={setToEdit}
+            setSetToEdit={setSetToEdit}
+            setIsEditModalVisible={setIsEditModalVisible}
+            setWeight={setWeight}
+            setReps={setReps}
+          />
+          <ShowSessionButton
+            title="Previous Sessions"
+            sessionArray={previousSessions}
+            isVisible={isPreviousSessionsVisible}
+            setVisibility={setIsPreviousSessionsVisible}
+            setToEdit={setToEdit}
+            setSetToEdit={setSetToEdit}
+            setIsEditModalVisible={setIsEditModalVisible}
+            setWeight={setWeight}
+            setReps={setReps}
+          />
+        </ScrollView>
+      ) : (
+        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+          <Text style={{ color: '#697565', fontSize: 18 }}>You have no sets</Text>
+        </View>
+      )}
 
       <Pressable 
           style={styles.defaultButton}
@@ -219,7 +224,7 @@ const Dashboard = () => {
       </Pressable>
 
 
-    </View>
+    </SafeAreaView>
     
   )
 }

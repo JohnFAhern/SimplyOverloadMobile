@@ -45,16 +45,16 @@ useEffect(() => {
     return setExerciseList(response.data)
   }
 
-  const editExercise = async (exerciseName) => {
-    const response = await api.put(`/exercises/${currentExercise.exerciseId}`, {
+  const editExercise = async (exerciseId, exerciseName) => {
+    const response = await api.put(`/exercises/${exerciseId}`, {
       dayId: currentDay.dayId,
       exerciseName
     })
     return getExercises()
   }
 
-  const deleteExercise = async () => {
-      await api.delete(`/exercises/${currentExercise.exerciseId}`);
+  const deleteExercise = async (exerciseId) => {
+      await api.delete(`/exercises/${exerciseId}`);
       return getExercises();
     }
 

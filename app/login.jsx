@@ -1,4 +1,5 @@
 import { View, Text, Pressable, TextInput } from 'react-native'
+import { SafeAreaView } from 'react-native-safe-area-context'
 import { Link } from "expo-router"
 import { authStyles as styles } from '../styles/authStyles'
 import React, { useState, useEffect, useContext } from 'react'
@@ -30,7 +31,7 @@ const Login = () => {
 
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
         
         <View style={styles.boxContainer}>
             <View style={styles.headerContainer}>
@@ -74,7 +75,7 @@ const Login = () => {
             </View>
             
         </View>
-    </View>
+    </SafeAreaView>
   )
 }
 

@@ -36,29 +36,29 @@ export function DayProvider({children}) {
   }
 
   const createDay = async (dayName) => {
-    console.log("create day pressed in context")
-    const response = await api.post(`/days`, {userId: user.userId, dayName})
-    console.log("backend response: " + JSON.stringify(response.data))
-    return selectDay(response.data)
+      console.log("createDay URL:", api.defaults.baseURL + '/days')
+      console.log("createDay body:", {userId: user.userId, dayName})
+      const response = await api.post(`/days`, {userId: user.userId, dayName})
+      return selectDay(response.data)
   }
 
   const getDays = async () => {
-    console.log("getting days from days context")
-    const response = await api.get(`/days/user/${user.userId}`)
-    console.log("backend response: " + JSON.stringify(response.data))
-    return setDayList(response.data)
+      console.log("user object:", JSON.stringify(user))
+      console.log("Full URL:", `/days/user/${user.userId}`)
+      const response = await api.get(`/days/users/${user.userId}`)
+      return setDayList(response.data)
   }
 
-  const editDay = async (dayName) => {
-    const response = await api.put(`/days/${currentDay.dayId}`, {
+  const editDay = async (dayId, dayName) => {
+    const response = await api.put(`/days/${dayId}`, {
       userId: user.userId,
       dayName
     })
     return getDays()
   }
 
-  const deleteDay = async () => {
-    await api.delete(`/days/${currentDay.dayId}`);
+  const deleteDay = async (dayId) => {
+    await api.delete(`/days/${dayId}`);
     return getDays();
   }
 

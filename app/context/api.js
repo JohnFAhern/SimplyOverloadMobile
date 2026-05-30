@@ -8,13 +8,11 @@ const api = axios.create({
 });
 
 api.interceptors.request.use(async (config) => {
+    console.log("Full request URL:", config.baseURL + config.url)
     const userString = await AsyncStorage.getItem('user');
     if (userString) {
         const user = JSON.parse(userString);
         config.headers.Authorization = `Bearer ${user.token}`;
-        console.log('Token attached:', user.token)  // add this
-    } else {
-        console.log('No user found in storage')  // add this
     }
     return config;
 });

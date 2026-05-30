@@ -13,6 +13,9 @@ const ShowPersonalBestButton = ({ title, allTimeHigh, lastSessionHigh, isVisible
         </Pressable>
         {isVisible && (
           <View style={styles.PersonalBestContainer}>
+            {!allTimeHigh && !lastSessionHigh && (
+              <Text style={[styles.defaultButtonText, { color: '#aaa', fontStyle: 'italic' }]}>No sets yet</Text>
+            )}
             {allTimeHigh && (
               <>
                 <Text style={styles.defaultButtonText}>All Time High:</Text>

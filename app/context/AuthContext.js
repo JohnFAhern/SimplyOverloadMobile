@@ -5,6 +5,12 @@ import { Platform } from 'react-native'
 
 const AuthContext = createContext(null)
 
+/*
+email: testacc@test.com
+password: textacc
+
+*/
+
 export function AuthProvider({children}) {
   const [user, setUser] = useState(null)
 
@@ -39,11 +45,13 @@ export function AuthProvider({children}) {
   }
 
   const login = async (email, password) => {
-    console.log("accessing login")
-    
-    const response = await axios.post(`${API_HOST}/login`, {email, password})
-    console.log(response.data)
-    return setUserFromResponse(response)
+      console.log("accessing login")
+      console.log("Posting to:", `${API_HOST}/login`)
+      console.log("Body:", { email, password })
+      
+      const response = await axios.post(`${API_HOST}/login`, {email, password})
+      console.log("Response:", response.data)
+      return setUserFromResponse(response)
   }
 
   const register = async (email, password) => {

@@ -1,4 +1,5 @@
 import { View, Text, Pressable, TextInput, ScrollView, Modal } from 'react-native'
+import { SafeAreaView } from 'react-native-safe-area-context'
 import React, { useState, useContext, useEffect } from 'react'
 import { dashboardStyles as styles } from '../styles/dashboardStyles'
 import { Link, useRouter } from "expo-router"
@@ -7,6 +8,7 @@ import CreateDayModal from './components/CreateDayModal'
 import UpdateDayModal from './components/updateDayModal'
 import UpdateModal from './components/updateModal'
 import DayContext from './context/DayContext'
+import HamburgerMenu from './components/HamburgerMenu'
 
 const Dashboard = () => {
 
@@ -18,8 +20,8 @@ const Dashboard = () => {
 
   const router = useRouter()
 
-  const { currentUser, logout } = useContext(AuthContext)
-  const { getDays, createDay, currentDay, setCurrentDay, currentExercise, updateDay, deleteDay, dayList } = useContext(DayContext)
+  const { user, logout } = useContext(AuthContext)
+  const { getDays, createDay, selectDay, editDay, deleteDay, dayList } = useContext(DayContext)
 
     useEffect(() => {
         getDays()
@@ -43,8 +45,8 @@ const Dashboard = () => {
     }
 
 
-    const handleDaySelect = (dayID) => {
-      setCurrentDay(dayID)
+    const handleDaySelect = async (day) => {
+      await selectDay(day)
       router.push("/exercises")
     }
 
@@ -58,14 +60,10 @@ const Dashboard = () => {
       }
       try{
         console.log("trying update day!")
-          const res = await updateDay(dayToEdit.dayId, newDayName, currentUser);
-          console.log("Update set response:", res.data);
-          await getDays(currentUser).then((res) => {
-            setDays(res.data);
-          });
+          await editDay(dayToEdit.dayId, newDayName);
       } catch(error){
           console.log("Update Day: ", error)
-          setError(error.response?.data?.message || "An error occurred during Create Set");
+          setError(error.response?.data?.message || "An error occurred during Update Day");
       }
   }
 
@@ -77,9 +75,6 @@ const Dashboard = () => {
       }
       try{
           await deleteDay(dayToEdit.dayId);
-          await getDays(currentUser).then((res) => {
-            setDays(res.data);
-          });
       } catch(error){
           console.log("Delete Day: ", error)
           setError(error.response?.data?.message || "An error occurred during Delete Day");
@@ -87,7 +82,7 @@ const Dashboard = () => {
   }
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <CreateDayModal
         visible={isModalVisible}
         onClose={() => setIsModalVisible(false)}
@@ -136,11 +131,12 @@ const Dashboard = () => {
 }
 
 
-      <View style={styles.headerContainer}>
-          <Text style={styles.headerItem}>Days</Text>
-          <Pressable onPress={logout}>
-            <Text style={{ color: '#8B3A3A', textAlign: 'center', fontSize: 16 }}>Logout</Text>
-          </Pressable>
+      <View style={[styles.headerContainer, { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16 }]}>
+          <View style={{ flex: 1 }} />
+          <Text style={[styles.headerItem, { flex: 2, textAlign: 'center' }]}>Days</Text>
+          <View style={{ flex: 1, alignItems: 'flex-end' }}>
+            <HamburgerMenu onLogout={logout} />
+          </View>
       </View>
       {dayList == null ? (
         <Text>Loading</Text>
@@ -189,7 +185,7 @@ const Dashboard = () => {
       </Pressable>
 
 
-    </View>
+    </SafeAreaView>
     
   )
 }

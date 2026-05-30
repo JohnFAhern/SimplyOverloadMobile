@@ -31,8 +31,8 @@ export function SetEntryProvider({children}) {
 
   const getSetEntries = async () => {
     const response = await api.get(`/sets/exercise/${currentExercise.exerciseId}`)
-    return setSetEntryList(response.data)
-    
+    setSetEntryList(response.data)
+    return response.data
   }
 
   const createSetEntry = async (reps, weight) => {
@@ -41,8 +41,8 @@ export function SetEntryProvider({children}) {
       return getSetEntries()
   }
 
-  const editSetEntry = async (reps, weight) => {
-    const response = await api.put(`/sets/${currentSet.setEntryId}`, {
+  const editSetEntry = async (setEntryId, reps, weight) => {
+    const response = await api.put(`/sets/${setEntryId}`, {
       exerciseId: currentExercise.exerciseId,
       reps,
       weight
@@ -50,8 +50,8 @@ export function SetEntryProvider({children}) {
     return getSetEntries()
   }
 
-  const deleteSetEntry = async () => {
-      await api.delete(`/sets/${currentSet.setEntryId}`);
+  const deleteSetEntry = async (setEntryId) => {
+      await api.delete(`/sets/${setEntryId}`);
       return getSetEntries();
     }
 

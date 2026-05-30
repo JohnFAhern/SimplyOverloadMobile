@@ -1,9 +1,9 @@
 import { View, Text, Pressable, TextInput, ScrollView, Modal } from 'react-native'
+import { SafeAreaView } from 'react-native-safe-area-context'
 import React, { useState, useContext, useEffect } from 'react'
-import AsyncStorage from '@react-native-async-storage/async-storage'
 import { dashboardStyles as styles } from '../styles/dashboardStyles'
 import { Link, useRouter } from "expo-router"
-import AuthContext from './context/AuthContext'
+import DayContext from './context/DayContext'
 import ExerciseContext from './context/ExerciseContext'
 import CreateExerciseModal from './components/CreateExerciseModal'
 import UpdateModal from './components/updateModal'
@@ -13,47 +13,37 @@ const Dashboard = () => {
   const [isModalVisible, setIsModalVisible] = useState(false)
   const [error, setError] = useState("")
   const [newExerciseName, setNewExerciseName] = useState("")
-  const [exercises, setExercises] = useState([])
   const [isEditModalVisible, setIsEditModalVisible] = useState(false)
   const [exerciseToEdit, setExerciseToEdit] = useState(null)
 
   const router = useRouter()
 
-  const { currentUser } = useContext(AuthContext)
-  const { currentDay, setCurrentDay, getExercises, createExercise, setCurrentExercise, updateExerciseName, deleteExercise } = useContext(ExerciseContext)
-  useEffect(() => {
-      if (!currentUser) return;  
+  const { currentDay } = useContext(DayContext)
+  const { exerciseList, selectExercise, createExercise, getExercises, editExercise, deleteExercise } = useContext(ExerciseContext)
 
-      getExercises(currentDay.dayId)
-          .then(res => {
-              setExercises(res.data);
-          })
-          .catch(err => {
-              setError(err ||"Couldn't load Exercises");
-          });
+  useEffect(() => {
+      if (!currentDay) return;
+
+      getExercises().catch(err => setError("Couldn't load Exercises"));
 
     }, [currentDay]);
 
     const handleCreateExercise = async () =>{
         setError("")
-        if (exercises.some((e) => e.exerciseName === newExerciseName)) {
+        if (exerciseList.some((e) => e.exerciseName === newExerciseName)) {
             setError(`${newExerciseName} already exists!`);
             return;
         }
         try{
-            const res = await createExercise(newExerciseName);
-            console.log("Response from server:", res.data);
-            await getExercises(currentDay.dayId).then((res) => {
-                    setExercises(res.data);
-                });
+            await createExercise(newExerciseName);
+            await getExercises();
         }catch(error){
             console.log("Create Exercise:", error)
             setError(error.response?.data?.message || "An error occurred during Create Exercise");
         }
     }
     const handleExerciseSelect = async (exercise) => {
-      setCurrentExercise(exercise)
-      await AsyncStorage.setItem("currentExercise", JSON.stringify(exercise))
+      await selectExercise(exercise)
       router.push("/sets")
     }
 
@@ -64,11 +54,7 @@ const Dashboard = () => {
           return
       }
       try{
-          const res = await updateExerciseName(exerciseToEdit.exerciseId, newExerciseName);
-          console.log("Update exercise response:", res.data);
-          await getExercises(currentDay.dayId).then((res) => {
-            setExercises(res.data);
-          });
+          await editExercise(exerciseToEdit.exerciseId, newExerciseName);
       } catch(error){
           console.log("Update Exercise: ", error)
           setError(error.response?.data?.message || "An error occurred during Update Exercise");
@@ -83,9 +69,6 @@ const Dashboard = () => {
       }
       try{
           await deleteExercise(exerciseToEdit.exerciseId);
-          await getExercises(currentDay.dayId).then((res) => {
-            setExercises(res.data);
-          });
       } catch(error){
           console.log("Delete Exercise: ", error)
           setError(error.response?.data?.message || "An error occurred during Delete Exercise");
@@ -93,7 +76,7 @@ const Dashboard = () => {
     }
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <CreateExerciseModal
         visible={isModalVisible}
         onClose={() => setIsModalVisible(false)}
@@ -120,19 +103,23 @@ const Dashboard = () => {
           ["Update Exercise Name:", "Enter Updated Name:", newExerciseName, setNewExerciseName]
         ]}
       />
-      <View style={styles.headerContainer}>
-          <Text style={styles.headerItem}>{currentDay.dayName}</Text>
+      <View style={[styles.headerContainer, { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16 }]}>
+          <Pressable onPress={() => router.back()} hitSlop={10} style={{ flex: 1 }}>
+            <Text style={{ fontSize: 28, color: '#3E3F29' }}>‹</Text>
+          </Pressable>
+          <Text style={[styles.headerItem, { flex: 2, textAlign: 'center' }]}>{currentDay.dayName}</Text>
+          <View style={{ flex: 1 }} />
       </View>
-      {exercises == null ? (
+      {exerciseList == null ? (
         <Text>Loading</Text>
-      ) : exercises.length === 0 ? (
+      ) : exerciseList.length === 0 ? (
         <Text> You Dont Have Any Exercises!</Text>
       ) : (
         <ScrollView 
           style={styles.boxContainer}
           contentContainerStyle={{ gap: 15, paddingVertical: 15 }}
         >
-          {exercises.map((exercise) => (
+          {exerciseList.map((exercise) => (
             <Pressable 
               style={styles.dayButtonContainer}
               key={exercise.exerciseId}
@@ -164,7 +151,7 @@ const Dashboard = () => {
       </Pressable>
 
 
-    </View>
+    </SafeAreaView>
     
   )
 }

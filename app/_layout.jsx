@@ -33,7 +33,7 @@ export default function RootLayout() {
         <ExerciseProvider>
           <SetEntryProvider>
             <AuthGuard />
-            <Stack />
+            <Stack screenOptions={{ headerShown: false, gestureEnabled: true }} />
           </SetEntryProvider>
         </ExerciseProvider>
       </DayProvider>
