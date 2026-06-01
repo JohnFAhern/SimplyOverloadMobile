@@ -5,6 +5,12 @@ import { dashboardStyles as styles } from '../../styles/dashboardStyles'
 const UpdateSetModal = ({ visible, onClose, handleUpdateSet, handleDeleteSet, weight, setWeight, reps, setReps, error, set}) => {
   
   const handleSubmit = async () => {
+    if (weight === '' || weight === null || weight === undefined) {
+      return
+    }
+    if (reps === '' || reps === null || reps === undefined) {
+      return
+    }
     await handleUpdateSet()
     onClose()
     setWeight(0)
@@ -31,7 +37,7 @@ const UpdateSetModal = ({ visible, onClose, handleUpdateSet, handleDeleteSet, we
         </View>
         <View style={styles.boxContainer}>
           <View style={styles.labelAndTextContainer}>
-            {error ? <Text style={styles.errorText}>{error}</Text> : null}
+            {(weight === '' || weight === null || weight === undefined) ? <Text style={styles.errorText}>Weight cannot be empty.</Text> : (reps === '' || reps === null || reps === undefined) ? <Text style={styles.errorText}>Reps cannot be empty.</Text> : (error ? <Text style={styles.errorText}>{error}</Text> : null)}
             <Text style={styles.labelItem}>Enter Weight:</Text>
             <TextInput
               style={styles.textInputItem}

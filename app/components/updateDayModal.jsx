@@ -5,6 +5,9 @@ import { dashboardStyles as styles } from '../../styles/dashboardStyles'
 const UpdateDayModal = ({ visible, onClose, handleUpdateDay, dayToEdit, setDayToEdit, newDayName, setNewDayName, error}) => {
   
   const handleSubmit = async () => {
+    if (!newDayName || !newDayName.trim()) {
+      return
+    }
     await handleUpdateDay()
     onClose()
     setNewDayName("")
@@ -23,7 +26,7 @@ const UpdateDayModal = ({ visible, onClose, handleUpdateDay, dayToEdit, setDayTo
         </View>
         <View style={styles.boxContainer}>
           <View style={styles.labelAndTextContainer}>
-            {error ? <Text style={styles.errorText}>{error}</Text> : null}
+            {(!newDayName || !newDayName.trim()) ? <Text style={styles.errorText}>Day name cannot be empty.</Text> : (error ? <Text style={styles.errorText}>{error}</Text> : null)}
             <Text style={styles.labelItem}>Enter Day Name:</Text>
             <TextInput
               style={styles.textInputItem}

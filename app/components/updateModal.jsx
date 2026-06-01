@@ -15,6 +15,10 @@ const UpdateModal = ({ visible, onClose, error, title, setErrors, objToEdit, set
   
   const handleSubmit = async () => {
     console.log("handling submit")
+    const hasEmpty = variables.some((vars) => !vars[2] || (typeof vars[2] === 'string' && !vars[2].trim()))
+    if (hasEmpty) {
+      return
+    }
     await updateFunction()
     onClose()
   }
@@ -37,7 +41,7 @@ const UpdateModal = ({ visible, onClose, error, title, setErrors, objToEdit, set
         </View>
         <View style={styles.boxContainer}>
           <View style={styles.labelAndTextContainer}>
-            {error ? <Text style={styles.errorText}>{error}</Text> : null}
+            {variables.some((vars) => !vars[2] || (typeof vars[2] === 'string' && !vars[2].trim())) ? <Text style={styles.errorText}>Fields cannot be empty.</Text> : (error ? <Text style={styles.errorText}>{error}</Text> : null)}
             {variables.map((vars, index) => (
             <>
               <Text style={styles.labelItem}>{vars[0]}</Text>

@@ -100,5 +100,10 @@ export const dashboardStyles = StyleSheet.create({
         justifyContent: "center",
         alignContent: "center",
         padding: 20,
+    },
+    errorText: {
+        textAlign: 'center',
+        color: '#C0392B',
+        fontSize: 16,
     }
 });

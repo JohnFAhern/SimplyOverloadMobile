@@ -5,11 +5,6 @@ import { Platform } from 'react-native'
 
 const AuthContext = createContext(null)
 
-/*
-email: testacc@test.com
-password: textacc
-
-*/
 
 export function AuthProvider({children}) {
   const [user, setUser] = useState(null)

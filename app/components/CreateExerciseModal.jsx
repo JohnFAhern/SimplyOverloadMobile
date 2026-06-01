@@ -1,10 +1,16 @@
 import { View, Text, Pressable, TextInput, Modal } from 'react-native'
-import React from 'react'
+import React, { useState } from 'react'
 import { dashboardStyles as styles } from '../../styles/dashboardStyles'
 
 const CreateExerciseModal = ({ visible, onClose, handleCreateExercise, exerciseName, setExerciseName}) => {
+  const [localError, setLocalError] = useState('')
   
   const handleSubmit = async () => {
+    if (!exerciseName.trim()) {
+      setLocalError('Exercise name cannot be empty.')
+      return
+    }
+    setLocalError('')
     await handleCreateExercise()
     onClose()
     setExerciseName("")
@@ -20,7 +26,7 @@ const CreateExerciseModal = ({ visible, onClose, handleCreateExercise, exerciseN
       <View style={styles.modalContainer}>
         <View style={styles.boxContainer}>
           <View style={styles.labelAndTextContainer}>
-            
+            {localError ? <Text style={styles.errorText}>{localError}</Text> : null}
             <Text style={styles.labelItem}>Create Exercise:</Text>
             <TextInput
               style={styles.textInputItem}

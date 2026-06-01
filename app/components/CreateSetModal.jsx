@@ -1,10 +1,20 @@
 import { View, Text, Pressable, TextInput, Modal } from 'react-native'
-import React from 'react'
+import React, { useState } from 'react'
 import { dashboardStyles as styles } from '../../styles/dashboardStyles'
 
 const CreateSetModal = ({ visible, onClose, handleCreateSet, weight, setWeight, reps, setReps, error}) => {
+  const [localError, setLocalError] = useState('')
   
   const handleSubmit = async () => {
+    if (weight === '' || weight === null || weight === undefined) {
+      setLocalError('Weight cannot be empty.')
+      return
+    }
+    if (reps === '' || reps === null || reps === undefined) {
+      setLocalError('Reps cannot be empty.')
+      return
+    }
+    setLocalError('')
     await handleCreateSet()
     onClose()
     setWeight(0)
@@ -24,7 +34,7 @@ const CreateSetModal = ({ visible, onClose, handleCreateSet, weight, setWeight, 
           </View>
         <View style={styles.boxContainer}>
           <View style={styles.labelAndTextContainer}>
-            {error ? <Text style={styles.errorText}>{error}</Text> : null}
+            {localError ? <Text style={styles.errorText}>{localError}</Text> : (error ? <Text style={styles.errorText}>{error}</Text> : null)}
             <Text style={styles.labelItem}>Enter Weight:</Text>
             <TextInput
               style={styles.textInputItem}

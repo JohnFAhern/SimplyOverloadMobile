@@ -1,10 +1,16 @@
 import { View, Text, Pressable, TextInput, Modal } from 'react-native'
-import React from 'react'
+import React, { useState } from 'react'
 import { dashboardStyles as styles } from '../../styles/dashboardStyles'
 
-const CreateDayModal = ({ visible, onClose, handleCreateDay, dayName, setDayName}) => {
+const CreateDayModal = ({ visible, onClose, handleCreateDay, dayName, setDayName, error}) => {
+  const [localError, setLocalError] = useState('')
   
   const handleSubmit = async () => {
+    if (!dayName.trim()) {
+      setLocalError('Day name cannot be empty.')
+      return
+    }
+    setLocalError('')
     await handleCreateDay()
     onClose()
     setDayName("")
@@ -23,7 +29,7 @@ const CreateDayModal = ({ visible, onClose, handleCreateDay, dayName, setDayName
         </View>
         <View style={styles.boxContainer}>
           <View style={styles.labelAndTextContainer}>
-            
+            {localError ? <Text style={styles.errorText}>{localError}</Text> : (error ? <Text style={styles.errorText}>{error}</Text> : null)}
             <Text style={styles.labelItem}>Create Day:</Text>
             <TextInput
               style={styles.textInputItem}

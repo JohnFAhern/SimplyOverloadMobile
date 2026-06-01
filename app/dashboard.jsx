@@ -29,6 +29,10 @@ const Dashboard = () => {
 
     const handleCreateDay = async () =>{
         setError("")
+        if (!newDayName || !newDayName.trim()) {
+            setError("Day name cannot be empty.")
+            return;
+        }
         if (dayList.some((d) => d.dayName === newDayName)) {
             setError(`${newDayName} already exists!`);
             return;
@@ -89,7 +93,7 @@ const Dashboard = () => {
         handleCreateDay={handleCreateDay}
         dayName={newDayName}
         setDayName={setNewDayName}
-        //error={error}
+        error={error}
       />
 
 {    /*

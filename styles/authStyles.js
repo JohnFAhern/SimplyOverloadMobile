@@ -31,7 +31,7 @@ export const authStyles = StyleSheet.create({
         fontSize: 20,
     },
     boxContainer: {
-        justifyContent: "center",
+        justifyContent: "flex-start",
         alignSelf: "center",
         alignContent: "center",
         height: "95%",
@@ -39,6 +39,7 @@ export const authStyles = StyleSheet.create({
         borderWidth: 2,
         borderColor: "#7D8D86",
         borderRadius: 50,
+        paddingBottom: 20,
     },
     loginButton: {
         height: 70,
@@ -69,9 +70,10 @@ export const authStyles = StyleSheet.create({
         color: "#3E3F29",
     },
     labelAndInputContainer: {
-        height: "55%",
-        justifyContent: "center",
-        gap: 30,
+        flex: 1,
+        justifyContent: "flex-start",
+        paddingTop: 10,
+        gap: 10,
     },
     signUpContainer: {
         flexDirection: "row",
