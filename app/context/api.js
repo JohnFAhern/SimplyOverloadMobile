@@ -1,18 +1,27 @@
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const API_HOST = 'http://localhost:8080/api/v1';
+const API_HOST = 'https://simplyoverloadbackendjava-production.up.railway.app/api/v1';
 
 const api = axios.create({
     baseURL: API_HOST
 });
 
+let cachedToken = null;
+
+export const setApiToken = (token) => { cachedToken = token; };
+export const clearApiToken = () => { cachedToken = null; };
+
 api.interceptors.request.use(async (config) => {
     console.log("Full request URL:", config.baseURL + config.url)
-    const userString = await AsyncStorage.getItem('user');
-    if (userString) {
-        const user = JSON.parse(userString);
-        config.headers.Authorization = `Bearer ${user.token}`;
+    if (!cachedToken) {
+        const userString = await AsyncStorage.getItem('user');
+        if (userString) {
+            cachedToken = JSON.parse(userString).token;
+        }
+    }
+    if (cachedToken) {
+        config.headers.Authorization = `Bearer ${cachedToken}`;
     }
     return config;
 });

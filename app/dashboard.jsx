@@ -27,22 +27,30 @@ const Dashboard = () => {
         getDays()
     }, []);
 
-    const handleCreateDay = async () =>{
+    const toTitleCase = (str) => {
+      return str
+          .toLowerCase()
+          .split(' ')
+          .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+          .join(' ')
+    }
+    const handleCreateDay = async () => {
         setError("")
-        if (!newDayName || !newDayName.trim()) {
+
+        const name = toTitleCase(newDayName)
+
+        if (!name || !name.trim()) {
             setError("Day name cannot be empty.")
             return;
         }
-        if (dayList.some((d) => d.dayName === newDayName)) {
-            setError(`${newDayName} already exists!`);
+        if (dayList.some((d) => d.dayName === name)) {
+            setError(`${name} already exists!`);
             return;
         }
-        try{
-            await createDay(newDayName);
+        try {
+            await createDay(name);
             console.log("handling create day")
-            await getDays()
-
-        }catch(error){
+        } catch(error) {
             console.log("Create Day:", error)
             setError(error.response?.data?.message || "An error occurred during Create Day");
         }
@@ -54,22 +62,26 @@ const Dashboard = () => {
       router.push("/exercises")
     }
 
-    const handleUpdateDay = async () =>{
-      console.log("accessing updateDay")
-      setError("")
-      if (!dayToEdit?.dayId) {
-        console.log("if statement!")
-          setError("No day selected to update")
-          return
-      }
-      try{
-        console.log("trying update day!")
-          await editDay(dayToEdit.dayId, newDayName);
-      } catch(error){
-          console.log("Update Day: ", error)
-          setError(error.response?.data?.message || "An error occurred during Update Day");
-      }
-  }
+    const handleUpdateDay = async () => {
+        setError("")
+        
+        const name = toTitleCase(newDayName)
+
+        if (!name || !name.trim()) {
+            setError("Day name cannot be empty.")
+            return
+        }
+        if (!dayToEdit?.dayId) {
+            setError("No day selected to update")
+            return
+        }
+        try {
+            await editDay(dayToEdit.dayId, name);
+        } catch(error) {
+            console.log("Update Day:", error)
+            setError(error.response?.data?.message || "An error occurred during Update Day");
+        }
+    }
 
   const handleDeleteDay = async () =>{
       setError("")

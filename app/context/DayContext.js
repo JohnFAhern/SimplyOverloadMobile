@@ -22,6 +22,8 @@ export function DayProvider({children}) {
     loadCurrentDayData()
   }, [])
 
+  
+
   const selectDay = async (object) => {
     console.log("Accessing selectDay in context/DayContext")
     const dayData = {
@@ -39,6 +41,7 @@ export function DayProvider({children}) {
       console.log("createDay URL:", api.defaults.baseURL + '/days')
       console.log("createDay body:", {userId: user.userId, dayName})
       const response = await api.post(`/days`, {userId: user.userId, dayName})
+      setDayList(prev => [...prev, response.data])
       return selectDay(response.data)
   }
 

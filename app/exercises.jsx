@@ -28,51 +28,74 @@ const Dashboard = () => {
 
     }, [currentDay]);
 
-    const handleCreateExercise = async () =>{
-        setError("")
-        if (exerciseList.some((e) => e.exerciseName === newExerciseName)) {
-            setError(`${newExerciseName} already exists!`);
-            return;
-        }
-        try{
-            await createExercise(newExerciseName);
-            await getExercises();
-        }catch(error){
-            console.log("Create Exercise:", error)
-            setError(error.response?.data?.message || "An error occurred during Create Exercise");
-        }
-    }
     const handleExerciseSelect = async (exercise) => {
       await selectExercise(exercise)
       router.push("/sets")
     }
 
-    const handleUpdateExercise = async () =>{
-      setError("")
-      if (!exerciseToEdit?.exerciseId) {
-          setError("No exercise selected to update")
-          return
-      }
-      try{
-          await editExercise(exerciseToEdit.exerciseId, newExerciseName);
-      } catch(error){
-          console.log("Update Exercise: ", error)
-          setError(error.response?.data?.message || "An error occurred during Update Exercise");
-      }
+    const toTitleCase = (str) => {
+      return str
+          .toLowerCase()
+          .split(' ')
+          .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+          .join(' ')
     }
 
-    const handleDeleteExercise = async () =>{
-      setError("")
-      if (!exerciseToEdit?.exerciseId) {
-          setError("No exercise selected to delete")
-          return
-      }
-      try{
-          await deleteExercise(exerciseToEdit.exerciseId);
-      } catch(error){
-          console.log("Delete Exercise: ", error)
-          setError(error.response?.data?.message || "An error occurred during Delete Exercise");
-      }
+    const handleCreateExercise = async () => {
+        setError("")
+        
+        const name = toTitleCase(newExerciseName)
+
+        if (!name || !name.trim()) {
+            setError("Exercise name cannot be empty.")
+            return
+        }
+        if (exerciseList.some((e) => e.exerciseName === name)) {
+            setError(`${name} already exists!`);
+            return;
+        }
+        try {
+            await createExercise(name);
+            await getExercises();
+        } catch(error) {
+            console.log("Create Exercise:", error)
+            setError(error.response?.data?.message || "An error occurred during Create Exercise");
+        }
+    }
+
+    const handleUpdateExercise = async () => {
+        setError("")
+
+        const name = toTitleCase(newExerciseName)
+
+        if (!name || !name.trim()) {
+            setError("Exercise name cannot be empty.")
+            return
+        }
+        if (!exerciseToEdit?.exerciseId) {
+            setError("No exercise selected to update")
+            return
+        }
+        try {
+            await editExercise(exerciseToEdit.exerciseId, name);
+        } catch(error) {
+            console.log("Update Exercise:", error)
+            setError(error.response?.data?.message || "An error occurred during Update Exercise");
+        }
+    }
+
+    const handleDeleteExercise = async () => {
+        setError("")
+        if (!exerciseToEdit?.exerciseId) {
+            setError("No exercise selected to delete")
+            return
+        }
+        try {
+            await deleteExercise(exerciseToEdit.exerciseId);
+        } catch(error) {
+            console.log("Delete Exercise:", error)
+            setError(error.response?.data?.message || "An error occurred during Delete Exercise");
+        }
     }
 
   return (

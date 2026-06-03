@@ -4,16 +4,23 @@ import { dashboardStyles as styles } from '../../styles/dashboardStyles'
 
 const CreateDayModal = ({ visible, onClose, handleCreateDay, dayName, setDayName, error}) => {
   const [localError, setLocalError] = useState('')
+  const [isSubmitting, setIsSubmitting] = useState(false)
   
   const handleSubmit = async () => {
     if (!dayName.trim()) {
       setLocalError('Day name cannot be empty.')
       return
     }
+    if (isSubmitting) return
     setLocalError('')
-    await handleCreateDay()
-    onClose()
-    setDayName("")
+    setIsSubmitting(true)
+    try {
+      await handleCreateDay()
+      onClose()
+      setDayName("")
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   return (
@@ -39,10 +46,11 @@ const CreateDayModal = ({ visible, onClose, handleCreateDay, dayName, setDayName
             />
           </View>
           <Pressable 
-            style={styles.defaultButton}
+            style={[styles.defaultButton, isSubmitting && { opacity: 0.5 }]}
             onPress={handleSubmit}
+            disabled={isSubmitting}
           >
-            <Text style={styles.defaultButtonText}>Create Day</Text>
+            <Text style={styles.defaultButtonText}>{isSubmitting ? 'Creating...' : 'Create Day'}</Text>
           </Pressable>
         </View>
         <Pressable 

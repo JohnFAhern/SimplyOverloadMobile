@@ -2,6 +2,7 @@ import React, { createContext, useState, useEffect } from 'react'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import axios from 'axios'
 import { Platform } from 'react-native'
+import { setApiToken, clearApiToken } from './api'
 
 const AuthContext = createContext(null)
 
@@ -9,12 +10,16 @@ const AuthContext = createContext(null)
 export function AuthProvider({children}) {
   const [user, setUser] = useState(null)
 
-  const API_HOST = "http://localhost:8080/api/v1/auth"
+  const API_HOST = 'https://simplyoverloadbackendjava-production.up.railway.app/api/v1/auth';
 
   useEffect(() => {
     const loadUserData = async () => {
       const userString = await AsyncStorage.getItem("user")
-      if(userString) setUser(JSON.parse(userString))
+      if(userString) {
+        const userData = JSON.parse(userString)
+        setApiToken(userData.token)
+        setUser(userData)
+      }
     }
     loadUserData()
   }, [])
@@ -32,6 +37,7 @@ export function AuthProvider({children}) {
 
     await AsyncStorage.setItem('user', JSON.stringify(userData));
     setUser(userData)
+    setApiToken(userData.token)
 
     console.log(`UserId: ${userData.userId}`)
     console.log(`email: ${userData.email}`)
@@ -59,6 +65,7 @@ export function AuthProvider({children}) {
 
   const logout = async () =>{
     console.log("Accessing log out")
+    clearApiToken()
     setUser(null)
     await AsyncStorage.removeItem("user")
   }
@@ -78,3 +85,4 @@ export function AuthProvider({children}) {
 }
 
 export default AuthContext
+
